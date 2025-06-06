@@ -1,6 +1,9 @@
 ﻿{
-    "FarmLinkTerminal_name": "FarmLink Terminali",
-    "FarmLinkTerminal_description": "Tüm öğelerinize tek bir bilgisayardan erişin ve yönetin.",
-    "FarmLinkTerminal_DisplayName": "FarmLink Terminali",
-    "FarmLinkTerminal_Recipe": "FarmLink Terminali"
+  "FarmLinkTerminal_name": "FarmLink Terminali",
+  "FarmLinkTerminal_description": "Tüm öğelerinize tek bir bilgisayardan erişin ve yönetin.",
+  "FarmLinkTerminal_DisplayName": "FarmLink Terminali",
+  "FarmLinkTerminal_Recipe": "FarmLink Terminali",
+
+  "BlockTerminal_DisplayName": "Terminal Engelleyici",
+  "BlockTerminal_Description": "Bu öğeyi içeren depolamalara FarmLink Terminal'inin erişmesini engeller."
 }

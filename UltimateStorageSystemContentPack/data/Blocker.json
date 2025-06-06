@@ -1,0 +1,28 @@
+{
+  "Changes": [
+    {
+      "LogName": "Load Block Terminal image",
+      "Action": "Load",
+      "Target": "Mods/{{ModID}}/BlockTerminal",
+      "FromFile": "assets/blockTerminal.png"
+    },
+    {
+      "Action": "EditData",
+      "Target": "Data/BigCraftables",
+      "Entries": {
+        "{{ModID}}_BlockTerminal": {
+          "Name": "{{ModID}}_BlockTerminal",
+          "DisplayName": "{{i18n:BlockTerminal_DisplayName}}",
+          "Description": "{{i18n:BlockTerminal_Description}}",
+          "Price": -1,
+          "Fragility": 0,
+          "CanBePlacedOutdoors": false,
+          "CanBePlacedIndoors": false,
+
+          "Texture": "Mods/{{ModID}}/BlockTerminal",
+          "SpriteIndex": 0
+        }
+      }
+    }
+  ]
+}

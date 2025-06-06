@@ -1,6 +1,9 @@
 ﻿{
-    "FarmLinkTerminal_name": "FarmLink Terminál",
-    "FarmLinkTerminal_description": "Hozzáférés és az összes tárgy kezelése egyetlen számítógépről.",
-    "FarmLinkTerminal_DisplayName": "FarmLink Terminál",
-    "FarmLinkTerminal_Recipe": "FarmLink Terminál"
+  "FarmLinkTerminal_name": "FarmLink Terminál",
+  "FarmLinkTerminal_description": "Hozzáférés és az összes tárgy kezelése egyetlen számítógépről.",
+  "FarmLinkTerminal_DisplayName": "FarmLink Terminál",
+  "FarmLinkTerminal_Recipe": "FarmLink Terminál",
+
+  "BlockTerminal_DisplayName": "Terminál blokkoló",
+  "BlockTerminal_Description": "Megakadályozza, hogy a FarmLink terminál hozzáférjen olyan tárolókhoz, amelyek ezt az elemet tartalmazzák."
 }

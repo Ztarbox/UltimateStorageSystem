@@ -1,6 +1,9 @@
 ﻿{
-    "FarmLinkTerminal_name": "Терминал FarmLink",
-    "FarmLinkTerminal_description": "Доступ и управление всеми вашими предметами с одного компьютера.",
-    "FarmLinkTerminal_DisplayName": "Терминал FarmLink",
-    "FarmLinkTerminal_Recipe": "Терминал FarmLink"
+  "FarmLinkTerminal_name": "Терминал FarmLink",
+  "FarmLinkTerminal_description": "Доступ и управление всеми вашими предметами с одного компьютера.",
+  "FarmLinkTerminal_DisplayName": "Терминал FarmLink",
+  "FarmLinkTerminal_Recipe": "Терминал FarmLink",
+
+  "BlockTerminal_DisplayName": "Блокиратор терминала",
+  "BlockTerminal_Description": "Предотвращает доступ терминала FarmLink к сундукам, содержащим этот предмет."
 }
