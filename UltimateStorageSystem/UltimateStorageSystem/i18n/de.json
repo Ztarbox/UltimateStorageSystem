@@ -1,3 +1,58 @@
 ﻿{
-    "no_storage_space_message": "Wähle erst einen Lagerplatz für diesen Gegenstand!"
+  "no_storage_space_message": "Wähle erst einen Lagerplatz für diesen Gegenstand!",
+  "not_enough_ingredients": "Nicht genügend Zutaten!",
+
+  "Search": "Suche: ",
+
+  "menu.shopSettings": "Shopeinstellungen",
+  "menu.shopSettingsTooltip": "Konfiguration für Verkäufer und Preis des Terminals.",
+  "menu.vendor": "Verkäufer",
+  "menu.vendorTooltip": "Der Verkäufer, der das Terminal anbietet.",
+  "menu.price": "Preis des Terminals",
+  "menu.priceTooltip": "Der Preis für das FarmLink Terminal.",
+  "menu.noticeTitle": "*** Hinweis ***",
+  "menu.noticeContent": "Änderungen am Verkäufer und Preis werden erst nach einem Neustart des Spiels übernommen.\n\nUm Änderungen ohne Neustart anzuwenden, geben Sie den folgenden Konsolenbefehl ein:",
+  "menu.command": "'patch reload holybananapants.UltimateStorageSystemContentPack'",
+  "menu.hotkeys": "Hotkeys",
+  "menu.hotkeysTooltip": "Tastenkonfiguration für den Zugang zum Terminal.",
+  "menu.hotkeyOpen": "Hotkey für Terminal öffnen",
+  "menu.hotkeyOpenTooltip": "Taste, um das FarmLink Terminal zu öffnen.",
+
+  "column.item": "Item",
+  "column.craft_item": "Herstellung",
+  "column.qty": "Menge",
+  "column.value": "Wert",
+  "column.total": "Gesamt",
+  "column.recipe": "Rezept",
+  "column.buffs": "Effekte",
+  "column.ingredients": "Zutaten",
+  "column.material": "Material",
+  "column.max": "Max.",
+  "column.type": "Typ",
+
+  "help.storage.leftclick.title": "Linksklick:",
+  "help.storage.shiftleftclick.title": "Umschalt + Linksklick:",
+  "help.storage.rightclick.title": "Rechtsklick:",
+  "help.storage.shiftrightclick.title": "Umschalt + Rechtsklick:",
+  "help.storage.leftclick.desc": "Gesamten Stapel übertragen",
+  "help.storage.shiftleftclick.desc": "Halben Stapel übertragen",
+  "help.storage.rightclick.desc": "1 Gegenstand übertragen",
+  "help.storage.shiftrightclick.desc": "10 Gegenstände übertragen",
+
+  "help.crafting.leftclick.title": "Linksklick:",
+  "help.crafting.shiftleftclick.title": "Umschalt + Linksklick:",
+  "help.crafting.rightclick.title": "Rechtsklick:",
+  "help.crafting.quick.desc.split1": "1 Gegenstand herstellen",
+  "help.crafting.quick.desc.split2": "5 Gegenstände herstellen",
+  "help.crafting.multi.desc": "Multicraft: Menge mit dem Mausrad einstellen und Linksklick auf freien Slot",
+
+  "help.cooking.leftclick.title": "Linksklick:",
+  "help.cooking.shiftleftclick.title": "Umschalt + Linksklick:",
+  "help.cooking.rightclick.title": "Rechtsklick:",
+  "help.cooking.quick.desc.split1": "1 Gericht kochen",
+  "help.cooking.quick.desc.split2": "5 Gerichte kochen",
+  "help.cooking.multi.desc": "Multikochen: Menge mit dem Mausrad einstellen und Linksklick auf freien Slot",
+
+  "help.shopping.leftclick.title": "Linksklick:",
+  "help.shopping.leftclick.desc": "Nur Anzeige – keine Aktionen verfügbar"
 }

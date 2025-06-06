@@ -1,3 +1,58 @@
 ﻿{
-    "no_storage_space_message": "请先选择此物品的存放位置！"
+  "no_storage_space_message": "请先选择此物品的存放位置",
+  "not_enough_ingredients": "材料不足",
+
+  "Search": "搜索: ",
+
+  "menu.shopSettings": "商店设置",
+  "menu.shopSettingsTooltip": "终端的供应商和价格配置。",
+  "menu.vendor": "供应商",
+  "menu.vendorTooltip": "提供终端的供应商。",
+  "menu.price": "终端价格",
+  "menu.priceTooltip": "FarmLink终端的价格。",
+  "menu.noticeTitle": "*** 注意 ***",
+  "menu.noticeContent": "供应商和价格的更改将仅在重新启动游戏后生效。\n\n要在不重新启动的情况下应用更改，请输入以下控制台命令：",
+  "menu.command": "'patch reload holybananapants.UltimateStorageSystemContentPack'",
+  "menu.hotkeys": "快捷键",
+  "menu.hotkeysTooltip": "访问终端的按键配置。",
+  "menu.hotkeyOpen": "打开终端的快捷键",
+  "menu.hotkeyOpenTooltip": "打开FarmLink终端的按键。",
+
+  "column.item": "物品",
+  "column.craft_item": "制作",
+  "column.qty": "数量",
+  "column.value": "价值",
+  "column.total": "总计",
+  "column.recipe": "配方",
+  "column.buffs": "增益",
+  "column.ingredients": "材料",
+  "column.material": "材料",
+  "column.max": "最大",
+  "column.type": "类型",
+
+  "help.storage.leftclick.title": "左键单击：",
+  "help.storage.shiftleftclick.title": "移位键 + 左键单击：",
+  "help.storage.rightclick.title": "右键单击：",
+  "help.storage.shiftrightclick.title": "移位键 + 右键单击：",
+  "help.storage.leftclick.desc": "转移整叠",
+  "help.storage.shiftleftclick.desc": "转移半叠",
+  "help.storage.rightclick.desc": "转移 1 件物品",
+  "help.storage.shiftrightclick.desc": "转移 10 件物品",
+
+  "help.crafting.leftclick.title": "左键单击：",
+  "help.crafting.shiftleftclick.title": "移位键 + 左键单击：",
+  "help.crafting.rightclick.title": "右键单击：",
+  "help.crafting.quick.desc.split1": "制作 1 件物品",
+  "help.crafting.quick.desc.split2": "制作 5 件物品",
+  "help.crafting.multi.desc": "多重制作：滚动鼠标滚轮设置数量，然后在空槽上左键单击",
+
+  "help.cooking.leftclick.title": "左键单击：",
+  "help.cooking.shiftleftclick.title": "移位键 + 左键单击：",
+  "help.cooking.rightclick.title": "右键单击：",
+  "help.cooking.quick.desc.split1": "烹饪 1 道菜",
+  "help.cooking.quick.desc.split2": "烹饪 5 道菜",
+  "help.cooking.multi.desc": "多重烹饪：滚动鼠标滚轮设置数量，然后在空槽上左键单击",
+
+  "help.shopping.leftclick.title": "左键单击：",
+  "help.shopping.leftclick.desc": "仅显示 – 无可用操作"
 }

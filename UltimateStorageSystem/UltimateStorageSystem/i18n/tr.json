@@ -1,3 +1,58 @@
 ﻿{
-    "no_storage_space_message": "Önce bu öğe için bir saklama yeri seçin!"
+  "no_storage_space_message": "Önce bu öğe için bir saklama yeri seçin!",
+  "not_enough_ingredients": "Yeterli malzeme yok!",
+
+  "Search": "Ara: ",
+
+  "menu.shopSettings": "Dükkan Ayarları",
+  "menu.shopSettingsTooltip": "Terminalin satıcısı ve fiyatı için yapılandırma.",
+  "menu.vendor": "Satıcı",
+  "menu.vendorTooltip": "Terminali sunan satıcı.",
+  "menu.price": "Terminal Fiyatı",
+  "menu.priceTooltip": "FarmLink Terminalinin fiyatı.",
+  "menu.noticeTitle": "*** DİKKAT ***",
+  "menu.noticeContent": "Satıcı ve fiyat değişiklikleri, oyunun yeniden başlatılmasından sonra geçerli olacaktır.\n\nDeğişiklikleri yeniden başlatmadan uygulamak için aşağıdaki konsol komutunu girin:",
+  "menu.command": "'patch reload holybananapants.UltimateStorageSystemContentPack'",
+  "menu.hotkeys": "Kısayollar",
+  "menu.hotkeysTooltip": "Terminale erişim için tuş yapılandırması.",
+  "menu.hotkeyOpen": "Terminali açma kısayolu",
+  "menu.hotkeyOpenTooltip": "FarmLink Terminalini açmak için tuş.",
+
+  "column.item": "Öğe",
+  "column.craft_item": "Üretim",
+  "column.qty": "Adet",
+  "column.value": "Değer",
+  "column.total": "Toplam",
+  "column.recipe": "Tarif",
+  "column.buffs": "Güçlendirme",
+  "column.ingredients": "Malzemeler",
+  "column.material": "Malzeme",
+  "column.max": "Maks.",
+  "column.type": "Tür",
+
+  "help.storage.leftclick.title": "Sol tık:",
+  "help.storage.shiftleftclick.title": "Değiştirme tuşu + sol tık:",
+  "help.storage.rightclick.title": "Sağ tık:",
+  "help.storage.shiftrightclick.title": "Değiştirme tuşu + sağ tık:",
+  "help.storage.leftclick.desc": "Tüm yığını aktar",
+  "help.storage.shiftleftclick.desc": "Yığının yarısını aktar",
+  "help.storage.rightclick.desc": "1 öğe aktar",
+  "help.storage.shiftrightclick.desc": "10 öğe aktar",
+
+  "help.crafting.leftclick.title": "Sol tık:",
+  "help.crafting.shiftleftclick.title": "Değiştirme tuşu + sol tık:",
+  "help.crafting.rightclick.title": "Sağ tık:",
+  "help.crafting.quick.desc.split1": "1 öğe üret",
+  "help.crafting.quick.desc.split2": "5 öğe üret",
+  "help.crafting.multi.desc": "Çoklu üretim: miktarı farenin tekerleğiyle ayarlayın ve boş bir yuvaya sol tıklayın",
+
+  "help.cooking.leftclick.title": "Sol tık:",
+  "help.cooking.shiftleftclick.title": "Değiştirme tuşu + sol tık:",
+  "help.cooking.rightclick.title": "Sağ tık:",
+  "help.cooking.quick.desc.split1": "1 yemek pişir",
+  "help.cooking.quick.desc.split2": "5 yemek pişir",
+  "help.cooking.multi.desc": "Çoklu pişirme: miktarı farenin tekerleğiyle ayarlayın ve boş bir yuvaya sol tıklayın",
+
+  "help.shopping.leftclick.title": "Sol tık:",
+  "help.shopping.leftclick.desc": "Sadece görüntüleme – işlem yapılamaz"
 }

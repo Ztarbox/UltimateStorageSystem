@@ -1,3 +1,58 @@
 ﻿{
-    "no_storage_space_message": "Először válasszon egy tárolóhelyet ehhez a tételhez!"
+  "no_storage_space_message": "Először válasszon egy tárolóhelyet ehhez a tételhez!",
+  "not_enough_ingredients": "Nincs elég hozzávaló!",
+
+  "Search": "Keresés: ",
+
+  "menu.shopSettings": "Boltbeállítások",
+  "menu.shopSettingsTooltip": "Beállítás a terminál eladójához és árához.",
+  "menu.vendor": "Eladó",
+  "menu.vendorTooltip": "Az eladó, aki a terminált kínálja.",
+  "menu.price": "A terminál ára",
+  "menu.priceTooltip": "A FarmLink Terminál ára.",
+  "menu.noticeTitle": "*** FIGYELMEZTETÉS ***",
+  "menu.noticeContent": "A változtatások az eladón és az áron csak a játék újraindítása után lépnek életbe.\n\nA változtatások újraindítás nélküli alkalmazásához írja be a következő konzolparancsot:",
+  "menu.command": "'patch reload holybananapants.UltimateStorageSystemContentPack'",
+  "menu.hotkeys": "Gyorsbillentyűk",
+  "menu.hotkeysTooltip": "Beállítások a terminálhoz való hozzáféréshez.",
+  "menu.hotkeyOpen": "Gyorsbillentyű a terminál megnyitásához",
+  "menu.hotkeyOpenTooltip": "A FarmLink Terminál megnyitásához szükséges billentyű.",
+
+  "column.item": "Tárgy",
+  "column.craft_item": "Készítés",
+  "column.qty": "Menny.",
+  "column.value": "Érték",
+  "column.total": "Össz.",
+  "column.recipe": "Recept",
+  "column.buffs": "Bónusz",
+  "column.ingredients": "Hozzávalók",
+  "column.material": "Anyag",
+  "column.max": "Max.",
+  "column.type": "Típus",
+
+  "help.storage.leftclick.title": "Bal kattintás:",
+  "help.storage.shiftleftclick.title": "Módosítógomb + bal kattintás:",
+  "help.storage.rightclick.title": "Jobb kattintás:",
+  "help.storage.shiftrightclick.title": "Módosítógomb + jobb kattintás:",
+  "help.storage.leftclick.desc": "Teljes halom áthelyezése",
+  "help.storage.shiftleftclick.desc": "A halom felének áthelyezése",
+  "help.storage.rightclick.desc": "1 tárgy áthelyezése",
+  "help.storage.shiftrightclick.desc": "10 tárgy áthelyezése",
+
+  "help.crafting.leftclick.title": "Bal kattintás:",
+  "help.crafting.shiftleftclick.title": "Módosítógomb + bal kattintás:",
+  "help.crafting.rightclick.title": "Jobb kattintás:",
+  "help.crafting.quick.desc.split1": "1 tárgy készítése",
+  "help.crafting.quick.desc.split2": "5 tárgy készítése",
+  "help.crafting.multi.desc": "Multicraft: állítsd be a mennyiséget az egérgörgővel, majd bal kattintás egy üres mezőre",
+
+  "help.cooking.leftclick.title": "Bal kattintás:",
+  "help.cooking.shiftleftclick.title": "Módosítógomb + bal kattintás:",
+  "help.cooking.rightclick.title": "Jobb kattintás:",
+  "help.cooking.quick.desc.split1": "1 étel elkészítése",
+  "help.cooking.quick.desc.split2": "5 étel elkészítése",
+  "help.cooking.multi.desc": "Többszörös főzés: állítsd be a mennyiséget az egérgörgővel, majd bal kattintás egy üres mezőre",
+
+  "help.shopping.leftclick.title": "Bal kattintás:",
+  "help.shopping.leftclick.desc": "Csak megjelenítés – nincs elérhető művelet"
 }

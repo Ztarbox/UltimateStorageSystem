@@ -1,103 +1,85 @@
-﻿// SCROLLBAR.CS
-// This file defines a scrollbar used for navigating the
-// item table and handles the corresponding user interactions.
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
-using UltimateStorageSystem.Interfaces; // Import the interface
-
-#nullable disable
+using UltimateStorageSystem.Interfaces;
 
 namespace UltimateStorageSystem.Drawing
 {
     public class Scrollbar
     {
-        // Areas for the scrollbar
-        private readonly Rectangle scrollBarRunner;  // The area within which the scrollbar can move
-        private Rectangle scrollBar;  // The actual scrollbar slider
-        private bool isScrolling = false;  // Flag to indicate if scrolling is in progress
-        private readonly IScrollableTable table;  // Reference to the table being scrolled
+        private readonly Rectangle scrollBarRunner;
 
-        // Constructor, initializes the scrollbar with position and associated table
+        private Rectangle scrollBar;
+
+        private bool isScrolling = false;
+
+        private int dragOffset = 0;
+
+        private readonly IScrollableTable table;
+
         public Scrollbar(int x, int y, IScrollableTable table)
         {
             this.table = table;
-            scrollBarRunner = new Rectangle(x - 5, y + 40, 20, 400);  // Offset the scrollbar 40px down and 5px to the left
+            scrollBarRunner = new Rectangle(x - 5, y + 40, 20, 400);
             scrollBar = new Rectangle(scrollBarRunner.X, scrollBarRunner.Y, 20, 20);
         }
 
-        // Draws the scrollbar on the screen
         public void Draw(SpriteBatch b)
         {
-            // Draws the background of the scrollbar
             b.Draw(Game1.staminaRect, new Rectangle(scrollBarRunner.X, scrollBarRunner.Y, scrollBarRunner.Width, scrollBarRunner.Height), Color.Gray);
-
-            // Draws the scrollbar slider
             b.Draw(Game1.staminaRect, scrollBar, Color.White);
         }
 
-        // Handles left-clicks on the scrollbar and starts the scrolling process
         public void ReceiveLeftClick(int x, int y)
         {
-            if (scrollBarRunner.Contains(x, y))
+            if (scrollBar.Contains(x, y))
             {
                 isScrolling = true;
-                UpdateScrollBar(y);
+                dragOffset = y - scrollBar.Y;
+            }
+            else if (scrollBarRunner.Contains(x, y))
+            {
+                isScrolling = true;
+                dragOffset = scrollBar.Height / 2;
+                HandleDrag(y);
             }
         }
 
-        // Handles held left-clicks and adjusts the scrollbar accordingly
         public void LeftClickHeld(int x, int y)
         {
             if (isScrolling)
             {
-                UpdateScrollBar(y);
+                HandleDrag(y);
             }
         }
 
-        // Ends the scrolling process when the mouse button is released
         public void ReleaseLeftClick(int _x, int _y)
         {
             isScrolling = false;
         }
 
-        // Handles scroll wheel actions and scrolls the table accordingly
         public void ReceiveScrollWheelAction(int direction)
         {
-            int scrollAmount = direction > 0 ? -1 : 1; // Scroll up or down
+            int scrollAmount = ((direction <= 0) ? 1 : (-1));
             int itemCount = table.GetItemEntriesCount();
             int visibleRows = table.GetVisibleRows();
             table.ScrollIndex = Math.Clamp(table.ScrollIndex + scrollAmount, 0, Math.Max(0, itemCount - visibleRows));
             UpdateScrollBarPosition();
         }
 
-        // Updates the scrollbar position based on the current scroll index of the table
-        public void UpdateScrollBarPosition()
+        public void UpdatePosition(float proportionVisible, int scrollIndex, int maxScrollIndex)
         {
-            int itemCount = table.GetItemEntriesCount();
-            int visibleRows = table.GetVisibleRows();
-
-            if (itemCount > visibleRows)
-            {
-                // Calculate the proportion of visible rows to total rows
-                float proportionVisible = visibleRows / (float)itemCount;
-
-                // Adjust the height of the scrollbar slider
-                scrollBar.Height = (int)(scrollBarRunner.Height * proportionVisible);
-
-                // Calculate where the slider should be positioned
-                float percent = table.ScrollIndex / (float)(itemCount - visibleRows);
-                scrollBar.Y = scrollBarRunner.Y + (int)(percent * (scrollBarRunner.Height - scrollBar.Height));
-            }
-            else
-            {
-                scrollBar.Y = scrollBarRunner.Y;
-                scrollBar.Height = scrollBarRunner.Height; // The slider is maximized if there is nothing to scroll
-            }
+            scrollBar.Height = (int)(scrollBarRunner.Height * proportionVisible);
+            float percent = scrollIndex / (float)maxScrollIndex;
+            scrollBar.Y = scrollBarRunner.Y + (int)(percent * (scrollBarRunner.Height - scrollBar.Height));
         }
 
-        // Updates the position of the scrollbar based on the mouse position
+        public void SetToMaxSize()
+        {
+            scrollBar.Y = scrollBarRunner.Y;
+            scrollBar.Height = scrollBarRunner.Height;
+        }
+
         private void UpdateScrollBar(int y)
         {
             float percent = (y - scrollBarRunner.Y) / (float)(scrollBarRunner.Height - scrollBar.Height);
@@ -106,6 +88,38 @@ namespace UltimateStorageSystem.Drawing
             table.ScrollIndex = (int)(percent * Math.Max(0, itemCount - visibleRows));
             table.ScrollIndex = Math.Clamp(table.ScrollIndex, 0, Math.Max(0, itemCount - visibleRows));
             UpdateScrollBarPosition();
+        }
+
+        public void UpdateScrollBarPosition()
+        {
+            int itemCount = table.GetItemEntriesCount();
+            int visibleRows = table.GetVisibleRows();
+            if (itemCount > visibleRows)
+            {
+                float proportionVisible = visibleRows / (float)itemCount;
+                UpdatePosition(proportionVisible, table.ScrollIndex, itemCount - visibleRows);
+            }
+            else
+            {
+                SetToMaxSize();
+            }
+        }
+
+        private void HandleDrag(int mouseY)
+        {
+            int runnerHeight = scrollBarRunner.Height;
+            int barHeight = scrollBar.Height;
+            float relative = mouseY - scrollBarRunner.Y - dragOffset;
+            relative = Math.Clamp(relative, 0f, runnerHeight - barHeight);
+            int itemCount = table.GetItemEntriesCount();
+            int visibleRows = table.GetVisibleRows();
+            if (itemCount > visibleRows)
+            {
+                float pct = relative / (runnerHeight - barHeight);
+                int maxScroll = itemCount - visibleRows;
+                table.ScrollIndex = Math.Clamp((int)(pct * maxScroll), 0, maxScroll);
+                UpdateScrollBarPosition();
+            }
         }
     }
 }
