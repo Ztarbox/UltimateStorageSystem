@@ -212,7 +212,11 @@ namespace UltimateStorageSystem.Drawing
                             this.currentRecipe.consumeIngredients(inventories);
                         }
                         this.UpdateCraftingTable();
-                        this.currentRecipe.timesCrafted += this.craftAmount;
+                        if (Game1.player.craftingRecipes.ContainsKey(this.currentRecipe.name))
+                        {
+                            Game1.player.craftingRecipes[this.currentRecipe.name] += this.craftAmount;
+                            Game1.stats.checkForCraftingAchievements();
+                        }
                         this.craftMode = false;
                         break;
                     }

@@ -204,7 +204,10 @@ namespace UltimateStorageSystem.Drawing
                                 this.ConsumeIngredientsPrioritized(this.currentRecipe, 1);
                             }
                             this.UpdateCookingTable();
-                            this.currentRecipe.timesCrafted += this.cookAmount;
+
+                            Game1.player.cookedRecipe(result.ItemId);
+                            Game1.stats.checkForCookingAchievements();
+
                             this.cookMode = false;
                         }
                         break;
