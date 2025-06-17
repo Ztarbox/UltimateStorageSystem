@@ -36,39 +36,39 @@ namespace UltimateStorageSystem.Drawing
             this.y = y;
             this.table = table;
             this.searchLabel = searchLabel;
-            whiteTexture = new Texture2D(Game1.graphics.GraphicsDevice, 1, 1);
-            whiteTexture.SetData(new Color[1] { Color.White });
+            this.whiteTexture = new Texture2D(Game1.graphics.GraphicsDevice, 1, 1);
+            this.whiteTexture.SetData(new Color[1] { Color.White });
             Game1.keyboardDispatcher.Subscriber = this;
         }
 
         public void Draw(SpriteBatch b)
         {
-            b.Draw(destinationRectangle: new Rectangle(x, y, width, height), texture: whiteTexture, color: Color.Black * 0.8f);
-            Vector2 searchLabelPosition = new(x, y + 10);
-            Vector2 searchLabelSize = Game1.smallFont.MeasureString(searchLabel);
+            b.Draw(destinationRectangle: new Rectangle(this.x, this.y, this.width, this.height), texture: this.whiteTexture, color: Color.Black * 0.8f);
+            Vector2 searchLabelPosition = new(this.x, this.y + 10);
+            Vector2 searchLabelSize = Game1.smallFont.MeasureString(this.searchLabel);
             Vector2 textPosition = new(searchLabelPosition.X + searchLabelSize.X, searchLabelPosition.Y);
-            string displayText = inputText;
-            if (showCursor)
+            string displayText = this.inputText;
+            if (this.showCursor)
             {
                 displayText += "_";
             }
-            b.DrawString(Game1.smallFont, searchLabel, searchLabelPosition, Color.Orange);
+            b.DrawString(Game1.smallFont, this.searchLabel, searchLabelPosition, Color.Orange);
             b.DrawString(Game1.smallFont, displayText, textPosition, Color.White);
         }
 
         public void UpdateTable(IFilterableTable newTable)
         {
-            table = newTable;
-            table.FilterItems(inputText);
+            this.table = newTable;
+            this.table.FilterItems(this.inputText);
         }
 
         public void Update(GameTime gameTime)
         {
-            cursorBlinkTimer += gameTime.ElapsedGameTime.TotalMilliseconds;
-            if (cursorBlinkTimer >= 500.0)
+            this.cursorBlinkTimer += gameTime.ElapsedGameTime.TotalMilliseconds;
+            if (this.cursorBlinkTimer >= 500.0)
             {
-                showCursor = !showCursor;
-                cursorBlinkTimer = 0.0;
+                this.showCursor = !this.showCursor;
+                this.cursorBlinkTimer = 0.0;
             }
         }
 
@@ -76,22 +76,22 @@ namespace UltimateStorageSystem.Drawing
         {
             if (!char.IsControl(inputChar))
             {
-                inputText += inputChar;
-                table.FilterItems(inputText);
+                this.inputText += inputChar;
+                this.table.FilterItems(this.inputText);
             }
         }
 
         public void ReceiveKeyPress(Keys key)
         {
-            if (key == Keys.Back && inputText.Length > 0)
+            if (key == Keys.Back && this.inputText.Length > 0)
             {
-                inputText = inputText.Substring(0, inputText.Length - 1);
-                table.FilterItems(inputText);
+                this.inputText = this.inputText.Substring(0, this.inputText.Length - 1);
+                this.table.FilterItems(this.inputText);
             }
             else if (key == Keys.Escape)
             {
-                inputText = "";
-                table.FilterItems("");
+                this.inputText = "";
+                this.table.FilterItems("");
             }
         }
 
@@ -109,8 +109,8 @@ namespace UltimateStorageSystem.Drawing
 
         public void Reset()
         {
-            inputText = "";
-            table.FilterItems("");
+            this.inputText = "";
+            this.table.FilterItems("");
         }
     }
 }

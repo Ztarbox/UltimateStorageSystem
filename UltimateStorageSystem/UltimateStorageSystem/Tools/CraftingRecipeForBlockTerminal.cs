@@ -7,8 +7,8 @@ namespace UltimateStorageSystem.Tools
         public CraftingRecipeForBlockTerminal()
             : base("Custom_BlockTerminal", isCookingRecipe: false)
         {
-            recipeList = new Dictionary<string, int> { { "388", 1 } };
-            bigCraftable = true;
+            this.recipeList = new Dictionary<string, int> { { "388", 1 } };
+            this.bigCraftable = true;
         }
 
         public override Item createItem()

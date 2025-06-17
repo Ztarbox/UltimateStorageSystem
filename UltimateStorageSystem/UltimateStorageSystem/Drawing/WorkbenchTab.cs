@@ -32,13 +32,11 @@ namespace UltimateStorageSystem.Drawing
 
         private List<CraftingRecipe> craftingRecipes;
 
-        private Dictionary<string, string> objectInformation;
-
-        public InputHandler inputHandler;
+        public InputHandler? inputHandler;
 
         public bool craftMode = false;
 
-        private CraftingRecipe currentRecipe = null;
+        private CraftingRecipe? currentRecipe = null;
 
         private int maxCraftable = 0;
 
@@ -50,26 +48,25 @@ namespace UltimateStorageSystem.Drawing
 
         public FarmLinkTerminalMenu TerminalMenu { get; set; }
 
-        public WorkbenchTab(int xPositionOnScreen, int yPositionOnScreen, int containerWidth, int containerHeight, FarmLinkTerminalMenu terminalMenu, Dictionary<string, string> objectInformation = null)
+        public WorkbenchTab(int xPositionOnScreen, int yPositionOnScreen, int containerWidth, int containerHeight, FarmLinkTerminalMenu terminalMenu)
             : base(xPositionOnScreen, yPositionOnScreen, containerWidth, containerHeight)
         {
-            TerminalMenu = terminalMenu;
+            this.TerminalMenu = terminalMenu;
             this.containerWidth = containerWidth;
             this.containerHeight = containerHeight;
-            computerMenuHeight = containerHeight - inventoryMenuHeight;
+            this.computerMenuHeight = containerHeight - this.inventoryMenuHeight;
             int slotsPerRow = 12;
             int slotSize = 64;
-            inventoryMenuWidth = slotsPerRow * slotSize;
-            int inventoryMenuX = base.xPositionOnScreen + (containerWidth - inventoryMenuWidth) / 2 - 90;
-            int inventoryMenuY = base.yPositionOnScreen + computerMenuHeight + 70;
-            playerInventoryMenu = new InventoryMenu(inventoryMenuX, inventoryMenuY, playerInventory: false);
-            craftingRecipes = (from name in CraftingRecipe.craftingRecipes.Keys
+            this.inventoryMenuWidth = slotsPerRow * slotSize;
+            int inventoryMenuX = base.xPositionOnScreen + (containerWidth - this.inventoryMenuWidth) / 2 - 90;
+            int inventoryMenuY = base.yPositionOnScreen + this.computerMenuHeight + 70;
+            this.playerInventoryMenu = new InventoryMenu(inventoryMenuX, inventoryMenuY, playerInventory: false);
+            this.craftingRecipes = (from name in CraftingRecipe.craftingRecipes.Keys
                                where Game1.player.craftingRecipes.ContainsKey(name)
                                select new CraftingRecipe(name) into recipe
                                where recipe != null
                                select recipe).ToList();
-            this.objectInformation = objectInformation;
-            craftingRecipes.Add(new CraftingRecipeForBlockTerminal());
+            this.craftingRecipes.Add(new CraftingRecipeForBlockTerminal());
             List<string> columnHeaders = new()
             {
                 ModHelper.Helper.Translation.Get("column.craft_item"),
@@ -79,23 +76,23 @@ namespace UltimateStorageSystem.Drawing
             };
             List<int> columnWidths = new() { 300, 160, 300, 100 };
             List<bool> columnAlignments = new() { false, false, false, true };
-            List<TableRowWithIcon> tableRows = GenerateCraftingData();
-            CraftingTable = new DynamicTable(xPositionOnScreen + 30, yPositionOnScreen + 40, columnHeaders, columnWidths, columnAlignments, tableRows, scrollbar, showCraftingQuantity: true);
-            scrollbar = new Scrollbar(xPositionOnScreen + containerWidth - 50, yPositionOnScreen + 103, CraftingTable);
-            CraftingTable.scrollbar = scrollbar;
-            transferManager = new ItemTransferManager(terminalMenu.GetAllStorageObjects(), CraftingTable);
+            List<TableRowWithIcon> tableRows = this.GenerateCraftingData();
+            this.CraftingTable = new DynamicTable(xPositionOnScreen + 30, yPositionOnScreen + 40, columnHeaders, columnWidths, columnAlignments, tableRows, this.scrollbar, showCraftingQuantity: true);
+            this.scrollbar = new Scrollbar(xPositionOnScreen + containerWidth - 50, yPositionOnScreen + 103, this.CraftingTable);
+            this.CraftingTable.Scrollbar = this.scrollbar;
+            this.transferManager = new ItemTransferManager(terminalMenu.GetAllStorageObjects(), this.CraftingTable);
         }
 
         private List<TableRowWithIcon> GenerateCraftingData()
         {
             List<TableRowWithIcon> rows = new();
-            foreach (CraftingRecipe recipe in craftingRecipes)
+            foreach (CraftingRecipe recipe in this.craftingRecipes)
             {
                 Item item = recipe.createItem();
                 string itemName = item.DisplayName;
                 string itemType = item.getCategoryName();
-                string ingredients = GetIngredientsString(recipe);
-                string maxQuantity = CalculateMaxCraftable(recipe).ToString();
+                string ingredients = this.GetIngredientsString(recipe);
+                string maxQuantity = this.CalculateMaxCraftable(recipe).ToString();
                 Debug.WriteLine("Item: " + itemName + ", Ingredients: " + ingredients);
                 rows.Add(new TableRowWithIcon(item, new List<string> { itemName, itemType, ingredients, maxQuantity }));
             }
@@ -104,7 +101,7 @@ namespace UltimateStorageSystem.Drawing
 
         public void ResetSort()
         {
-            CraftingTable?.ResetSort();
+            this.CraftingTable?.ResetSort();
         }
 
         private string GetIngredientsString(CraftingRecipe recipe)
@@ -121,7 +118,7 @@ namespace UltimateStorageSystem.Drawing
 
         private int CalculateMaxCraftable(CraftingRecipe recipe)
         {
-            List<Chest> chests = TerminalMenu?.GetAllStorageObjects();
+            var chests = this.TerminalMenu?.GetAllStorageObjects();
             return recipe.getCraftableCount(chests);
         }
 
@@ -131,11 +128,11 @@ namespace UltimateStorageSystem.Drawing
             int fixedWidth = 1000;
             int upperFrameHeight = 620;
             int inventoryFrameHeight = 280;
-            int tableWidth = CraftingTable.ColumnWidths.Sum() + (CraftingTable.ColumnWidths.Count - 1) * 10;
+            int tableWidth = this.CraftingTable.ColumnWidths.Sum() + (this.CraftingTable.ColumnWidths.Count - 1) * 10;
             string title = "ULTIMATE CRAFTING SYSTEM";
             float scale = 0.8f;
             Vector2 titleSize = Game1.dialogueFont.MeasureString(title) * scale;
-            Vector2 titlePosition = new(xPositionOnScreen + tableWidth - titleSize.X + 75f, yPositionOnScreen + 30);
+            Vector2 titlePosition = new(this.xPositionOnScreen + tableWidth - titleSize.X + 75f, this.yPositionOnScreen + 30);
             Color titleColor = Color.Orange;
             Color titleShadowColor = Color.Brown;
             for (int dx = -1; dx <= 1; dx++)
@@ -146,47 +143,47 @@ namespace UltimateStorageSystem.Drawing
                 }
             }
             b.DrawString(Game1.dialogueFont, title, titlePosition, titleColor, 0f, Vector2.Zero, scale, SpriteEffects.None, 0.86f);
-            CraftingTable.Draw(b);
-            IClickableMenu.drawTextureBox(b, xPositionOnScreen, yPositionOnScreen + upperFrameHeight - 60, fixedWidth, inventoryFrameHeight - 30, Color.White);
-            playerInventoryMenu.draw(b);
-            if (craftMode && currentRecipe != null)
+            this.CraftingTable.Draw(b);
+            IClickableMenu.drawTextureBox(b, this.xPositionOnScreen, this.yPositionOnScreen + upperFrameHeight - 60, fixedWidth, inventoryFrameHeight - 30, Color.White);
+            this.playerInventoryMenu.draw(b);
+            if (this.craftMode && this.currentRecipe != null)
             {
                 Vector2 mousePos = new(Game1.getMouseX(), Game1.getMouseY());
-                Item icon = currentRecipe.createItem();
-                icon.Stack = craftAmount;
+                Item icon = this.currentRecipe.createItem();
+                icon.Stack = this.craftAmount;
                 icon.drawInMenu(b, mousePos, 1f, 1f, 0.9f, StackDrawType.Draw, Color.White, drawShadow: false);
             }
-            drawMouse(b);
+            this.drawMouse(b);
         }
 
         public override void receiveLeftClick(int x, int y, bool playSound = true)
         {
-            if (craftMode && currentRecipe != null)
+            if (this.craftMode && this.currentRecipe != null)
             {
-                foreach (ClickableComponent slot in playerInventoryMenu.inventory)
+                foreach (ClickableComponent slot in this.playerInventoryMenu.inventory)
                 {
-                    if (slot.containsPoint(x, y) && playerInventoryMenu.actualInventory.Count > slot.myID)
+                    if (slot.containsPoint(x, y) && this.playerInventoryMenu.actualInventory.Count > slot.myID)
                     {
-                        Item existingItem = playerInventoryMenu.actualInventory[slot.myID];
+                        Item existingItem = this.playerInventoryMenu.actualInventory[slot.myID];
                         Item result;
-                        if (currentRecipe is CraftingRecipeForBlockTerminal)
+                        if (this.currentRecipe is CraftingRecipeForBlockTerminal)
                         {
                             result = ItemRegistry.Create("(BC)holybananapants.UltimateStorageSystemContentPack_BlockTerminal");
-                            result.Stack = craftAmount;
+                            result.Stack = this.craftAmount;
                         }
                         else
                         {
-                            result = currentRecipe.createItem();
+                            result = this.currentRecipe.createItem();
                             if (result == null)
                             {
                                 Game1.playSound("cancel");
                                 break;
                             }
-                            result.Stack = craftAmount;
+                            result.Stack = this.craftAmount;
                         }
                         if (existingItem == null)
                         {
-                            playerInventoryMenu.actualInventory[slot.myID] = result;
+                            this.playerInventoryMenu.actualInventory[slot.myID] = result;
                             Game1.playSound("coin");
                         }
                         else
@@ -216,45 +213,44 @@ namespace UltimateStorageSystem.Drawing
                                 Game1.playSound("coin");
                             }
                         }
-                        List<IInventory> inventories = TerminalMenu.GetAllStorageObjects().Select((Func<Chest, IInventory>)((Chest ch) => ch.Items)).ToList();
-                        for (int i = 0; i < craftAmount; i++)
+                        List<IInventory> inventories = this.TerminalMenu.GetAllStorageObjects().Select((Func<Chest, IInventory>)(ch => ch.Items)).ToList();
+                        for (int i = 0; i < this.craftAmount; i++)
                         {
-                            currentRecipe.consumeIngredients(inventories);
+                            this.currentRecipe.consumeIngredients(inventories);
                         }
-                        UpdateCraftingTable();
-                        craftMode = false;
+                        this.UpdateCraftingTable();
+                        this.craftMode = false;
                         break;
                     }
                 }
                 return;
             }
             base.receiveLeftClick(x, y, playSound);
-            scrollbar.ReceiveLeftClick(x, y);
-            Item clicked = CraftingTable.GetClickedItem(x, y);
-            if (clicked == null || TerminalMenu == null)
+            this.scrollbar.ReceiveLeftClick(x, y);
+            var clicked = this.CraftingTable.GetClickedItem(x, y);
+            if (clicked == null || this.TerminalMenu == null)
             {
                 return;
             }
-            CraftingRecipe recipe = null;
-            recipe = ((!(clicked.QualifiedItemId == "(BC)holybananapants.UltimateStorageSystemContentPack_BlockTerminal")) ? craftingRecipes.FirstOrDefault((CraftingRecipe r) => r.name == clicked.Name || r.DisplayName == clicked.DisplayName) : craftingRecipes.OfType<CraftingRecipeForBlockTerminal>().FirstOrDefault());
+            var recipe = ((!(clicked.QualifiedItemId == "(BC)holybananapants.UltimateStorageSystemContentPack_BlockTerminal")) ? this.craftingRecipes.FirstOrDefault(r => r.name == clicked.Name || r.DisplayName == clicked.DisplayName) : this.craftingRecipes.OfType<CraftingRecipeForBlockTerminal>().FirstOrDefault());
             if (recipe == null)
             {
                 return;
             }
-            int maxCanCraft = recipe.getCraftableCount(TerminalMenu.GetAllStorageObjects());
+            int maxCanCraft = recipe.getCraftableCount(this.TerminalMenu.GetAllStorageObjects());
             if (maxCanCraft <= 0)
             {
                 Game1.addHUDMessage(new HUDMessage(ModHelper.Helper.Translation.Get("not_enough_ingredients"), 3));
                 return;
             }
             bool shift = Game1.oldKBState.IsKeyDown(Keys.LeftShift) || Game1.oldKBState.IsKeyDown(Keys.RightShift);
-            craftAmount = ((!shift) ? 1 : Math.Min(5, maxCanCraft));
-            List<IInventory> chestInventories = TerminalMenu.GetAllStorageObjects().Select((Func<Chest, IInventory>)((Chest chest) => chest.Items)).ToList();
-            for (int i2 = 0; i2 < craftAmount; i2++)
+            this.craftAmount = ((!shift) ? 1 : Math.Min(5, maxCanCraft));
+            List<IInventory> chestInventories = this.TerminalMenu.GetAllStorageObjects().Select((Func<Chest, IInventory>)(chest => chest.Items)).ToList();
+            for (int i2 = 0; i2 < this.craftAmount; i2++)
             {
                 recipe.consumeIngredients(chestInventories);
             }
-            for (int i3 = 0; i3 < craftAmount; i3++)
+            for (int i3 = 0; i3 < this.craftAmount; i3++)
             {
                 Item result2 = ((!(clicked.QualifiedItemId == "(BC)holybananapants.UltimateStorageSystemContentPack_BlockTerminal")) ? recipe.createItem() : ItemRegistry.Create("(BC)holybananapants.UltimateStorageSystemContentPack_BlockTerminal"));
                 if (result2 != null)
@@ -267,32 +263,32 @@ namespace UltimateStorageSystem.Drawing
                 }
             }
             Game1.playSound("coin");
-            UpdateCraftingTable();
+            this.UpdateCraftingTable();
         }
 
         public override void receiveRightClick(int x, int y, bool playSound = true)
         {
-            if (!craftMode)
+            if (!this.craftMode)
             {
-                Item clicked = CraftingTable.GetClickedItem(x, y);
+                var clicked = this.CraftingTable.GetClickedItem(x, y);
                 if (clicked != null)
                 {
                     if (clicked.QualifiedItemId == "(BC)holybananapants.UltimateStorageSystemContentPack_BlockTerminal")
                     {
-                        currentRecipe = craftingRecipes.OfType<CraftingRecipeForBlockTerminal>().FirstOrDefault();
+                        this.currentRecipe = this.craftingRecipes.OfType<CraftingRecipeForBlockTerminal>().FirstOrDefault();
                     }
                     else
                     {
-                        currentRecipe = craftingRecipes.FirstOrDefault((CraftingRecipe r) => r.name == clicked.Name || r.DisplayName == clicked.DisplayName);
+                        this.currentRecipe = this.craftingRecipes.FirstOrDefault(r => r.name == clicked.Name || r.DisplayName == clicked.DisplayName);
                     }
-                    if (currentRecipe != null)
+                    if (this.currentRecipe != null)
                     {
-                        int max = currentRecipe.getCraftableCount(TerminalMenu.GetAllStorageObjects());
+                        int max = this.currentRecipe.getCraftableCount(this.TerminalMenu.GetAllStorageObjects());
                         if (max > 0)
                         {
-                            craftMode = true;
-                            maxCraftable = max;
-                            craftAmount = 1;
+                            this.craftMode = true;
+                            this.maxCraftable = max;
+                            this.craftAmount = 1;
                             Game1.playSound("shiny4");
                         }
                         else
@@ -308,32 +304,30 @@ namespace UltimateStorageSystem.Drawing
 
         public override void receiveScrollWheelAction(int direction)
         {
-            if (craftMode)
+            if (this.craftMode)
             {
-                craftAmount = Math.Clamp(craftAmount + ((direction > 0) ? 1 : (-1)), 1, maxCraftable);
+                this.craftAmount = Math.Clamp(this.craftAmount + ((direction > 0) ? 1 : (-1)), 1, this.maxCraftable);
                 return;
             }
-            CraftingTable.ReceiveScrollWheelAction(direction);
-            scrollbar.UpdateScrollBarPosition();
+            this.CraftingTable.ReceiveScrollWheelAction(direction);
+            this.scrollbar.UpdateScrollBarPosition();
         }
 
         public void LeftClickHeld(int x, int y)
         {
-            CraftingTable.PerformHoverAction(x, y);
-            scrollbar.LeftClickHeld(x, y);
+            this.scrollbar.LeftClickHeld(x, y);
         }
 
         public override void performHoverAction(int x, int y)
         {
             base.performHoverAction(x, y);
-            CraftingTable.PerformHoverAction(x, y);
         }
 
         public override void receiveKeyPress(Keys key)
         {
-            if (craftMode && key == Keys.Escape)
+            if (this.craftMode && key == Keys.Escape)
             {
-                craftMode = false;
+                this.craftMode = false;
                 Game1.playSound("cancel");
             }
             else
@@ -344,34 +338,34 @@ namespace UltimateStorageSystem.Drawing
 
         public void CancelCraftMode()
         {
-            craftMode = false;
-            currentRecipe = null;
-            craftAmount = 1;
-            maxCraftable = 0;
+            this.craftMode = false;
+            this.currentRecipe = null;
+            this.craftAmount = 1;
+            this.maxCraftable = 0;
         }
 
         private void UpdateCraftingTable()
         {
-            string sortCol = CraftingTable.sortedColumn;
-            bool asc = CraftingTable.isAscending;
-            int scroll = CraftingTable.ScrollIndex;
-            List<TableRowWithIcon> newRows = GenerateCraftingData();
-            CraftingTable.ClearItems();
+            var sortCol = this.CraftingTable.SortedColumn;
+            bool asc = this.CraftingTable.isAscending;
+            int scroll = this.CraftingTable.ScrollIndex;
+            List<TableRowWithIcon> newRows = this.GenerateCraftingData();
+            this.CraftingTable.ClearItems();
             foreach (TableRowWithIcon row in newRows)
             {
-                CraftingTable.AllRows.Add(row);
+                this.CraftingTable.AllRows.Add(row);
             }
-            CraftingTable.Refresh();
-            CraftingTable.SortItemsBy(sortCol, asc);
-            CraftingTable.ScrollIndex = Math.Clamp(scroll, 0, Math.Max(0, CraftingTable.GetItemEntriesCount() - CraftingTable.GetVisibleRows()));
-            CraftingTable.scrollbar.UpdateScrollBarPosition();
+            this.CraftingTable.Refresh();
+            this.CraftingTable.SortItemsBy(sortCol, asc);
+            this.CraftingTable.ScrollIndex = Math.Clamp(scroll, 0, Math.Max(0, this.CraftingTable.GetItemEntriesCount() - this.CraftingTable.GetVisibleRows()));
+            this.CraftingTable.Scrollbar?.UpdateScrollBarPosition();
         }
 
         public override void update(GameTime time)
         {
             base.update(time);
-            CraftingTable.Update();
-            scrollbar.UpdateScrollBarPosition();
+            this.CraftingTable.Update();
+            this.scrollbar.UpdateScrollBarPosition();
         }
     }
 }

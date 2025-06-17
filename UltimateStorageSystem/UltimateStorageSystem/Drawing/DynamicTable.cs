@@ -11,27 +11,19 @@ namespace UltimateStorageSystem.Drawing
 {
     public class DynamicTable : IScrollableTable, IFilterableTable
     {
-        private List<string> ColumnHeaders;
+        private readonly List<string> ColumnHeaders;
 
         public List<int> ColumnWidths;
 
         public List<bool> ColumnAlignments;
 
-        private bool showCraftingQuantity;
+        private readonly bool showCraftingQuantity;
 
         public List<TableRowWithIcon> AllRows;
 
         private List<TableRowWithIcon> FilteredRows;
 
-        public Scrollbar scrollbar;
-
-        private int hoverRowIndex = -1;
-
-        private const int HeaderHeight = 35;
-
-        private const int RowHeight = 32;
-
-        private const int MaxTextLength = 15;
+        public Scrollbar? Scrollbar;
 
         private bool previousMousePressed = false;
 
@@ -41,32 +33,32 @@ namespace UltimateStorageSystem.Drawing
 
         public int ScrollIndex { get; set; } = 0;
 
-        public string sortedColumn { get; private set; }
+        public string SortedColumn { get; private set; } = "";
 
         public bool isAscending { get; private set; }
 
         private List<int> ColumnPositions { get; set; }
 
-        public DynamicTable(int startX, int startY, List<string> columnHeaders, List<int> columnWidths, List<bool> columnAlignments, List<TableRowWithIcon> rows, Scrollbar scrollbar, bool showCraftingQuantity = false)
+        public DynamicTable(int startX, int startY, List<string> columnHeaders, List<int> columnWidths, List<bool> columnAlignments, List<TableRowWithIcon> rows, Scrollbar? scrollbar = null, bool showCraftingQuantity = false)
         {
-            StartX = startX;
-            StartY = startY;
-            ColumnHeaders = columnHeaders;
-            ColumnWidths = columnWidths;
-            ColumnAlignments = columnAlignments;
-            AllRows = new List<TableRowWithIcon>(rows);
-            FilteredRows = new List<TableRowWithIcon>(rows);
-            this.scrollbar = scrollbar;
+            this.StartX = startX;
+            this.StartY = startY;
+            this.ColumnHeaders = columnHeaders;
+            this.ColumnWidths = columnWidths;
+            this.ColumnAlignments = columnAlignments;
+            this.AllRows = new List<TableRowWithIcon>(rows);
+            this.FilteredRows = new List<TableRowWithIcon>(rows);
+            this.Scrollbar = scrollbar;
             this.showCraftingQuantity = showCraftingQuantity;
-            if (ColumnHeaders.Count != ColumnWidths.Count || ColumnHeaders.Count != ColumnAlignments.Count)
+            if (this.ColumnHeaders.Count != this.ColumnWidths.Count || this.ColumnHeaders.Count != this.ColumnAlignments.Count)
             {
                 throw new ArgumentException("Die Anzahl der Spaltenüberschriften, Spaltenbreiten und Ausrichtungen muss übereinstimmen.");
             }
-            ColumnPositions = new List<int>();
-            int currentX = StartX;
+            this.ColumnPositions = new List<int>();
+            int currentX = this.StartX;
             for (int i = 0; i < columnWidths.Count; i++)
             {
-                ColumnPositions.Add(currentX);
+                this.ColumnPositions.Add(currentX);
                 currentX += columnWidths[i];
                 if (i < columnWidths.Count - 1)
                 {
@@ -77,7 +69,7 @@ namespace UltimateStorageSystem.Drawing
 
         public int GetItemEntriesCount()
         {
-            return FilteredRows.Count;
+            return this.FilteredRows.Count;
         }
 
         public int GetVisibleRows()
@@ -87,41 +79,41 @@ namespace UltimateStorageSystem.Drawing
 
         public int TotalTableWidth()
         {
-            return ColumnWidths.Sum() + (ColumnHeaders.Count - 1) * 10;
+            return this.ColumnWidths.Sum() + (this.ColumnHeaders.Count - 1) * 10;
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            DrawHeaders(spriteBatch);
-            DrawRows(spriteBatch);
-            scrollbar?.Draw(spriteBatch);
+            this.DrawHeaders(spriteBatch);
+            this.DrawRows(spriteBatch);
+            this.Scrollbar?.Draw(spriteBatch);
         }
 
         private void DrawHeaders(SpriteBatch spriteBatch)
         {
-            int headerY = StartY + 40;
+            int headerY = this.StartY + 40;
             bool isMousePressed = Game1.input.GetMouseState().LeftButton == ButtonState.Pressed;
-            for (int i = 0; i < ColumnHeaders.Count; i++)
+            for (int i = 0; i < this.ColumnHeaders.Count; i++)
             {
-                string header = ColumnHeaders[i];
-                int columnWidth = ColumnWidths[i];
-                bool isSortedColumn = header == sortedColumn;
-                bool alignRight = ColumnAlignments[i];
-                Vector2 headerPosition = new(ColumnPositions[i], headerY);
-                DrawHeaderWithSortIcon(spriteBatch, header, headerPosition, Color.White, isSortedColumn, isAscending, alignRight);
-                if (new Rectangle((int)headerPosition.X, (int)headerPosition.Y, columnWidth, 35).Contains(Game1.getMouseX(), Game1.getMouseY()) && !isMousePressed && previousMousePressed)
+                string header = this.ColumnHeaders[i];
+                int columnWidth = this.ColumnWidths[i];
+                bool isSortedColumn = header == this.SortedColumn;
+                bool alignRight = this.ColumnAlignments[i];
+                Vector2 headerPosition = new(this.ColumnPositions[i], headerY);
+                this.DrawHeaderWithSortIcon(spriteBatch, header, headerPosition, Color.White, isSortedColumn, this.isAscending, alignRight);
+                if (new Rectangle((int)headerPosition.X, (int)headerPosition.Y, columnWidth, 35).Contains(Game1.getMouseX(), Game1.getMouseY()) && !isMousePressed && this.previousMousePressed)
                 {
-                    ToggleSort(header);
+                    this.ToggleSort(header);
                 }
             }
-            previousMousePressed = isMousePressed;
-            spriteBatch.DrawLine(new Vector2(StartX, headerY + 35), new Vector2(StartX + TotalTableWidth(), headerY + 35), Color.White, 1f);
+            this.previousMousePressed = isMousePressed;
+            spriteBatch.DrawLine(new Vector2(this.StartX, headerY + 35), new Vector2(this.StartX + this.TotalTableWidth(), headerY + 35), Color.White, 1f);
         }
 
         private void DrawHeaderWithSortIcon(SpriteBatch spriteBatch, string text, Vector2 position, Color color, bool isSortedColumn, bool isAscending, bool alignRight)
         {
-            int columnIndex = ColumnHeaders.IndexOf(text);
-            int columnWidth = ColumnWidths[columnIndex];
+            int columnIndex = this.ColumnHeaders.IndexOf(text);
+            int columnWidth = this.ColumnWidths[columnIndex];
             Vector2 textSize = Game1.smallFont.MeasureString(text);
             Vector2 iconPosition = position;
             Rectangle sourceRect = (isAscending ? new Rectangle(421, 472, 12, 12) : new Rectangle(421, 459, 12, 12));
@@ -153,23 +145,22 @@ namespace UltimateStorageSystem.Drawing
 
         private void DrawRows(SpriteBatch spriteBatch)
         {
-            int contentStartY = StartY + 35 + 60;
-            for (int i = 0; i < GetVisibleRows(); i++)
+            int contentStartY = this.StartY + 35 + 60;
+            for (int i = 0; i < this.GetVisibleRows(); i++)
             {
-                int index = ScrollIndex + i;
-                if (index >= FilteredRows.Count)
+                int index = this.ScrollIndex + i;
+                if (index >= this.FilteredRows.Count)
                 {
                     break;
                 }
                 int rowY = contentStartY + 32 * i;
-                TableRowWithIcon rowContent = FilteredRows[index];
-                bool isHovered = new Rectangle(StartX, rowY, TotalTableWidth(), 32).Contains(Game1.getMouseX(), Game1.getMouseY());
+                TableRowWithIcon rowContent = this.FilteredRows[index];
+                bool isHovered = new Rectangle(this.StartX, rowY, this.TotalTableWidth(), 32).Contains(Game1.getMouseX(), Game1.getMouseY());
                 if (isHovered)
                 {
-                    hoverRowIndex = i;
-                    spriteBatch.Draw(Game1.staminaRect, new Rectangle(StartX, rowY, TotalTableWidth(), 32), Color.White * 0.15f);
+                    spriteBatch.Draw(Game1.staminaRect, new Rectangle(this.StartX, rowY, this.TotalTableWidth(), 32), Color.White * 0.15f);
                 }
-                DrawRowContent(spriteBatch, StartX, rowY, rowContent, isHovered);
+                this.DrawRowContent(spriteBatch, this.StartX, rowY, rowContent, isHovered);
             }
         }
 
@@ -178,10 +169,10 @@ namespace UltimateStorageSystem.Drawing
             for (int i = 0; i < row.Cells.Count; i++)
             {
                 string cellText = row.Cells[i];
-                int columnWidth = ColumnWidths[i];
-                bool alignRight = ColumnAlignments[i];
+                int columnWidth = this.ColumnWidths[i];
+                bool alignRight = this.ColumnAlignments[i];
                 Color textColor = Color.White;
-                Vector2 position = new(ColumnPositions[i], rowY);
+                Vector2 position = new(this.ColumnPositions[i], rowY);
                 if (i == 0 && row.ItemIcon != null)
                 {
                     if (row.ItemIcon is StardewValley.Object obj)
@@ -197,8 +188,8 @@ namespace UltimateStorageSystem.Drawing
                     float iconScale = 0.375f;
                     int iconWidth = (int)(64f * iconScale);
                     Vector2 iconPosition = new(position.X - 16f, rowY - 16);
-                    StardewValley.Object itemObj = row.ItemIcon as StardewValley.Object;
-                    if (row.ItemIcon is Ring || row.ItemIcon is Boots || (itemObj != null && itemObj.preserve.Value.HasValue && IsPreservedItemToShift(itemObj.preserve.Value.Value)))
+                    var itemObj = row.ItemIcon as StardewValley.Object;
+                    if (row.ItemIcon is Ring || row.ItemIcon is Boots || (itemObj != null && itemObj.preserve.Value.HasValue && this.IsPreservedItemToShift(itemObj.preserve.Value.Value)))
                     {
                         iconPosition.Y += 10f;
                         iconPosition.X += 10f;
@@ -216,11 +207,11 @@ namespace UltimateStorageSystem.Drawing
                     position.X += iconWidth + 15;
                     columnWidth -= iconWidth + 5;
                 }
-                if (i == 0 && showCraftingQuantity && row.ItemIcon.maximumStackSize() > 1 && row.ItemIcon.Stack > 1)
+                if (i == 0 && this.showCraftingQuantity && row.ItemIcon?.maximumStackSize() > 1 && row.ItemIcon.Stack > 1)
                 {
                     cellText += $" ({row.ItemIcon.Stack})";
                 }
-                DrawCellText(spriteBatch, cellText, position, columnWidth, alignRight, isHovered, textColor);
+                this.DrawCellText(spriteBatch, cellText, position, columnWidth, alignRight, isHovered, textColor);
             }
         }
 
@@ -235,7 +226,7 @@ namespace UltimateStorageSystem.Drawing
             bool needsScrolling = textWidth > columnWidth - 10;
             if (isHovered && needsScrolling)
             {
-                DrawScrollingText(spriteBatch, cellText, position, textColor, columnWidth - 10);
+                this.DrawScrollingText(spriteBatch, cellText, position, textColor, columnWidth - 10);
                 return;
             }
             string displayText = cellText;
@@ -247,7 +238,7 @@ namespace UltimateStorageSystem.Drawing
                 }
                 displayText += "...";
             }
-            DrawText(spriteBatch, displayText, position, textColor, alignRight, columnWidth);
+            this.DrawText(spriteBatch, displayText, position, textColor, alignRight, columnWidth);
         }
 
         private void DrawText(SpriteBatch spriteBatch, string text, Vector2 position, Color color, bool alignRight, int columnWidth)
@@ -294,28 +285,31 @@ namespace UltimateStorageSystem.Drawing
 
         private void ToggleSort(string column)
         {
-            if (sortedColumn == column)
+            if (this.SortedColumn == column)
             {
-                isAscending = !isAscending;
+                this.isAscending = !this.isAscending;
             }
             else
             {
-                sortedColumn = column;
-                isAscending = true;
+                this.SortedColumn = column;
+                this.isAscending = true;
             }
-            SortItemsBy(sortedColumn, isAscending);
+            this.SortItemsBy(this.SortedColumn, this.isAscending);
         }
 
-        public void SortItemsBy(string column, bool ascending)
+        public void SortItemsBy(string? column, bool ascending)
         {
-            int colIndex = ColumnHeaders.IndexOf(column);
+            if (column == null)
+            {
+                return;
+            }
+            int colIndex = this.ColumnHeaders.IndexOf(column);
             if (colIndex == -1)
             {
                 return;
             }
-            int result;
-            bool isNumeric = FilteredRows.All((TableRowWithIcon row) => int.TryParse(row.Cells[colIndex], out result));
-            FilteredRows.Sort(delegate (TableRowWithIcon a, TableRowWithIcon b)
+            bool isNumeric = this.FilteredRows.All(row => int.TryParse(row.Cells[colIndex], out int result));
+            this.FilteredRows.Sort(delegate (TableRowWithIcon a, TableRowWithIcon b)
             {
                 string text = a.Cells[colIndex] ?? string.Empty;
                 string text2 = b.Cells[colIndex] ?? string.Empty;
@@ -334,65 +328,46 @@ namespace UltimateStorageSystem.Drawing
         {
             if (string.IsNullOrWhiteSpace(searchText))
             {
-                FilteredRows = new List<TableRowWithIcon>(AllRows);
+                this.FilteredRows = new List<TableRowWithIcon>(this.AllRows);
             }
             else
             {
-                FilteredRows = AllRows.FindAll((TableRowWithIcon row) => row.Cells[0].IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0);
+                this.FilteredRows = this.AllRows.FindAll(row => row.Cells[0].IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0);
             }
-            FilteredRows = (from row in FilteredRows
+            this.FilteredRows = (from row in this.FilteredRows
                             orderby row.ItemIcon?.DisplayName ?? "", (row.ItemIcon as StardewValley.Object)?.Quality ?? 0 descending
                             select row).ToList();
-            ScrollIndex = 0;
-            scrollbar?.UpdateScrollBarPosition();
+            this.ScrollIndex = 0;
+            this.Scrollbar?.UpdateScrollBarPosition();
         }
 
         public void HandleHeaderClick(int x, int y)
         {
-            for (int i = 0; i < ColumnHeaders.Count; i++)
+            for (int i = 0; i < this.ColumnHeaders.Count; i++)
             {
-                int offsetX = StartX + ColumnWidths.Take(i).Sum() + 10 * i;
-                if (new Rectangle(offsetX, StartY + 40, ColumnWidths[i], 35).Contains(x, y))
+                int offsetX = this.StartX + this.ColumnWidths.Take(i).Sum() + 10 * i;
+                if (new Rectangle(offsetX, this.StartY + 40, this.ColumnWidths[i], 35).Contains(x, y))
                 {
-                    ToggleSort(ColumnHeaders[i]);
+                    this.ToggleSort(this.ColumnHeaders[i]);
                     break;
                 }
             }
         }
 
-        public void PerformHoverAction(int x, int y)
+        public Item? GetClickedItem(int x, int y)
         {
-            hoverRowIndex = -1;
-            for (int i = 0; i < GetVisibleRows(); i++)
+            int contentStartY = this.StartY + 35 + 60;
+            for (int i = 0; i < this.GetVisibleRows(); i++)
             {
-                int index = ScrollIndex + i;
-                if (index >= FilteredRows.Count)
-                {
-                    break;
-                }
-                int rowY = StartY + 35 + 32 * i + 10;
-                if (new Rectangle(StartX, rowY, TotalTableWidth(), 32).Contains(x, y))
-                {
-                    hoverRowIndex = i;
-                    break;
-                }
-            }
-        }
-
-        public Item GetClickedItem(int x, int y)
-        {
-            int contentStartY = StartY + 35 + 60;
-            for (int i = 0; i < GetVisibleRows(); i++)
-            {
-                int index = ScrollIndex + i;
-                if (index >= FilteredRows.Count)
+                int index = this.ScrollIndex + i;
+                if (index >= this.FilteredRows.Count)
                 {
                     break;
                 }
                 int rowY = contentStartY + 32 * i;
-                if (new Rectangle(StartX, rowY, TotalTableWidth(), 32).Contains(x, y))
+                if (new Rectangle(this.StartX, rowY, this.TotalTableWidth(), 32).Contains(x, y))
                 {
-                    return FilteredRows[index].ItemIcon;
+                    return this.FilteredRows[index].ItemIcon;
                 }
             }
             return null;
@@ -400,78 +375,78 @@ namespace UltimateStorageSystem.Drawing
 
         public void Update()
         {
-            scrollbar.UpdateScrollBarPosition();
+            this.Scrollbar?.UpdateScrollBarPosition();
         }
 
         public void ReceiveScrollWheelAction(int direction)
         {
             int scrollAmount = ((direction <= 0) ? 1 : (-1));
-            ScrollIndex = Math.Clamp(ScrollIndex + scrollAmount, 0, Math.Max(0, FilteredRows.Count - GetVisibleRows()));
-            scrollbar.UpdateScrollBarPosition();
+            this.ScrollIndex = Math.Clamp(this.ScrollIndex + scrollAmount, 0, Math.Max(0, this.FilteredRows.Count - this.GetVisibleRows()));
+            this.Scrollbar?.UpdateScrollBarPosition();
         }
 
         public void ResetSort()
         {
-            if (ColumnHeaders.Count > 0)
+            if (this.ColumnHeaders.Count > 0)
             {
-                sortedColumn = ColumnHeaders[0];
-                isAscending = true;
-                SortItemsBy(sortedColumn, isAscending);
+                this.SortedColumn = this.ColumnHeaders[0];
+                this.isAscending = true;
+                this.SortItemsBy(this.SortedColumn, this.isAscending);
             }
         }
 
         public void OpenTerminal()
         {
-            ResetSort();
+            this.ResetSort();
         }
 
         public void CloseTerminal()
         {
-            ResetSort();
+            this.ResetSort();
         }
 
         public void AddItem(ItemEntry item)
         {
-            AllRows.Add(new TableRowWithIcon(item.Item, new List<string>
-        {
-            item.Name,
-            item.Quantity.ToString(),
-            item.SingleValue.ToString(),
-            item.TotalValue.ToString()
-        }));
-            FilteredRows.Add(new TableRowWithIcon(item.Item, new List<string>
-        {
-            item.Name,
-            item.Quantity.ToString(),
-            item.SingleValue.ToString(),
-            item.TotalValue.ToString()
-        }));
+            this.AllRows.Add(new TableRowWithIcon(item.Item, new List<string>
+            {
+                item.Name,
+                item.Quantity.ToString(),
+                item.SingleValue.ToString(),
+                item.TotalValue.ToString()
+            }));
+            this.FilteredRows.Add(new TableRowWithIcon(item.Item, new List<string>
+            {
+                item.Name,
+                item.Quantity.ToString(),
+                item.SingleValue.ToString(),
+                item.TotalValue.ToString()
+            }));
         }
 
         public List<ItemEntry> GetItemEntries()
         {
-            return FilteredRows.Select((TableRowWithIcon row) => new ItemEntry(row.Cells[0], int.Parse(row.Cells[1]), int.Parse(row.Cells[2]), int.Parse(row.Cells[3]), row.ItemIcon)).ToList();
+            return this.FilteredRows.Select(row => new ItemEntry(row.Cells[0], int.Parse(row.Cells[1]), int.Parse(row.Cells[2]), int.Parse(row.Cells[3]), row.ItemIcon)).ToList();
         }
 
         public void Refresh()
         {
-            FilteredRows = new List<TableRowWithIcon>(AllRows);
+            this.FilteredRows = new List<TableRowWithIcon>(this.AllRows);
         }
 
         public void ClearItems()
         {
-            AllRows.Clear();
-            FilteredRows.Clear();
+            this.AllRows.Clear();
+            this.FilteredRows.Clear();
         }
 
         public void UpdateItemList(Item item, int remainingAmount)
         {
-            TableRowWithIcon entry = AllRows.Find((TableRowWithIcon row) => row.ItemIcon == item);
+            var entry = this.AllRows.Find(row => row.ItemIcon == item);
             if (entry != null)
             {
                 if (remainingAmount <= 0)
                 {
-                    AllRows.Remove(entry);
+                    this.AllRows.Remove(entry);
                 }
                 else
                 {
@@ -481,9 +456,9 @@ namespace UltimateStorageSystem.Drawing
             }
             else if (remainingAmount > 0)
             {
-                AddItem(new ItemEntry(item.DisplayName, remainingAmount, item.salePrice(), item.salePrice() * remainingAmount, item));
+                this.AddItem(new ItemEntry(item.DisplayName, remainingAmount, item.salePrice(), item.salePrice() * remainingAmount, item));
             }
-            Refresh();
+            this.Refresh();
         }
     }
 }

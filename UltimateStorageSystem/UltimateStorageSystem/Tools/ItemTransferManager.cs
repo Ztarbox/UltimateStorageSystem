@@ -20,9 +20,9 @@ namespace UltimateStorageSystem.Tools
 
         public void UpdateChestItemsAndSort()
         {
-            itemTable.ClearItems();
+            this.itemTable.ClearItems();
             Dictionary<string, ItemEntry> groupedItems = new();
-            foreach (Chest chest in chests)
+            foreach (Chest chest in this.chests)
             {
                 foreach (Item item in chest.Items)
                 {
@@ -43,20 +43,20 @@ namespace UltimateStorageSystem.Tools
                 }
             }
             List<ItemEntry> sortedItems = groupedItems.Values.ToList();
-            sortedItems = ItemSorting.SortItems(sortedItems, itemTable.sortedColumn, itemTable.isAscending);
+            sortedItems = ItemSorting.SortItems(sortedItems, this.itemTable.SortedColumn, this.itemTable.isAscending);
             foreach (ItemEntry entry in sortedItems)
             {
-                itemTable.AddItem(entry);
+                this.itemTable.AddItem(entry);
             }
-            itemTable.Refresh();
-            itemTable.SortItemsBy(itemTable.sortedColumn, itemTable.isAscending);
+            this.itemTable.Refresh();
+            this.itemTable.SortItemsBy(this.itemTable.SortedColumn, this.itemTable.isAscending);
         }
 
         private List<Item> CollectItemsFromChests(Item item, int amount)
         {
             List<Item> collectedItems = new();
             int remainingAmount = amount;
-            var sortedChests = (from chest2 in chests
+            var sortedChests = (from chest2 in this.chests
                                 select new
                                 {
                                     Chest = chest2,
@@ -104,7 +104,7 @@ namespace UltimateStorageSystem.Tools
         public void TransferFromInventoryToChests(Item item, int amount)
         {
             int remainingAmount = amount;
-            var sortedChests = (from chest2 in chests
+            var sortedChests = (from chest2 in this.chests
                                 select new
                                 {
                                     Chest = chest2,
@@ -136,26 +136,26 @@ namespace UltimateStorageSystem.Tools
             {
                 Game1.addHUDMessage(new HUDMessage(ModHelper.Helper.Translation.Get("no_storage_space_message"), 3));
             }
-            UpdateChestItemsAndSort();
+            this.UpdateChestItemsAndSort();
         }
 
         public void TransferFromChestsToInventory(Item item, int amount)
         {
-            List<Item> collectedItems = CollectItemsFromChests(item, amount);
+            List<Item> collectedItems = this.CollectItemsFromChests(item, amount);
             foreach (Item collectedItem in collectedItems)
             {
                 Game1.player.addItemToInventory(collectedItem);
             }
-            UpdateChestItemsAndSort();
+            this.UpdateChestItemsAndSort();
         }
 
         public void HandleLeftClick(Item item, bool isInInventory, bool shiftPressed)
         {
-            if (item is Furniture || item is Ring || item is MeleeWeapon || item is Tool || item is Boots)
+            if (item.maximumStackSize() == 1)
             {
                 if (!isInInventory)
                 {
-                    Chest sourceChest = chests.FirstOrDefault((Chest chest) => chest.Items.Contains(item));
+                    var sourceChest = this.chests.FirstOrDefault(chest => chest.Items.Contains(item));
                     if (sourceChest != null)
                     {
                         sourceChest.Items.Remove(item);
@@ -164,17 +164,17 @@ namespace UltimateStorageSystem.Tools
                 }
                 else
                 {
-                    TransferFromInventoryToChests(item, item.Stack);
+                    this.TransferFromInventoryToChests(item, item.Stack);
                 }
             }
             else if (isInInventory)
             {
                 int amountToTransfer = (shiftPressed ? Math.Max(1, item.Stack / 2) : item.Stack);
-                TransferFromInventoryToChests(item, amountToTransfer);
+                this.TransferFromInventoryToChests(item, amountToTransfer);
             }
             else
             {
-                ItemEntry entry = itemTable.GetItemEntries().FirstOrDefault((ItemEntry e) => e.Item == item);
+                var entry = this.itemTable.GetItemEntries().FirstOrDefault(e => e.Item == item);
                 int amountToTransfer;
                 if (entry != null)
                 {
@@ -186,16 +186,16 @@ namespace UltimateStorageSystem.Tools
                 {
                     amountToTransfer = (shiftPressed ? Math.Max(1, item.Stack / 2) : item.Stack);
                 }
-                TransferFromChestsToInventory(item, amountToTransfer);
+                this.TransferFromChestsToInventory(item, amountToTransfer);
             }
-            UpdateChestItemsAndSort();
-            itemTable.Refresh();
+            this.UpdateChestItemsAndSort();
+            this.itemTable.Refresh();
         }
 
         public void HandleRightClick(Item item, bool isInInventory, bool shiftPressed)
         {
             int amountToTransfer = ((!shiftPressed) ? 1 : 10);
-            ItemEntry entry = itemTable.GetItemEntries().FirstOrDefault((ItemEntry e) => e.Item == item);
+            var entry = this.itemTable.GetItemEntries().FirstOrDefault((e) => e.Item == item);
             if (entry != null)
             {
                 int maxStackSize = item.maximumStackSize();
@@ -205,7 +205,7 @@ namespace UltimateStorageSystem.Tools
             {
                 if (!isInInventory)
                 {
-                    Chest sourceChest = chests.FirstOrDefault((Chest chest) => chest.Items.Contains(item));
+                    var sourceChest = this.chests.FirstOrDefault(chest => chest.Items.Contains(item));
                     if (sourceChest != null)
                     {
                         sourceChest.Items.Remove(item);
@@ -214,19 +214,19 @@ namespace UltimateStorageSystem.Tools
                 }
                 else
                 {
-                    TransferFromInventoryToChests(item, amountToTransfer);
+                    this.TransferFromInventoryToChests(item, amountToTransfer);
                 }
             }
             else if (isInInventory)
             {
-                TransferFromInventoryToChests(item, amountToTransfer);
+                this.TransferFromInventoryToChests(item, amountToTransfer);
             }
             else
             {
-                TransferFromChestsToInventory(item, amountToTransfer);
+                this.TransferFromChestsToInventory(item, amountToTransfer);
             }
-            UpdateChestItemsAndSort();
-            itemTable.Refresh();
+            this.UpdateChestItemsAndSort();
+            this.itemTable.Refresh();
         }
     }
 }

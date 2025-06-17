@@ -21,36 +21,36 @@ namespace UltimateStorageSystem.Tools
 
         public void ReceiveLeftClick(int x, int y, bool playSound = true)
         {
-            playerInventoryMenu.receiveLeftClick(x, y, playSound);
-            scrollbar.ReceiveLeftClick(x, y);
+            this.playerInventoryMenu.receiveLeftClick(x, y, playSound);
+            this.scrollbar.ReceiveLeftClick(x, y);
         }
 
         public void LeftClickHeld(int x, int y)
         {
-            scrollbar.LeftClickHeld(x, y);
+            this.scrollbar.LeftClickHeld(x, y);
         }
 
         public void ReleaseLeftClick(int x, int y)
         {
-            scrollbar.ReleaseLeftClick(x, y);
+            this.scrollbar.ReleaseLeftClick(x, y);
         }
 
         public void PerformHoverAction(int x, int y)
         {
-            playerInventoryMenu.performHoverAction(x, y);
+            this.playerInventoryMenu.performHoverAction(x, y);
         }
 
         public void ReceiveKeyPress(Keys key)
         {
             if (key == Keys.Escape)
             {
-                terminalMenu.exitThisMenu();
+                this.terminalMenu.exitThisMenu();
             }
         }
 
         public void ReceiveScrollWheelAction(int direction)
         {
-            scrollbar.ReceiveScrollWheelAction(direction);
+            this.scrollbar.ReceiveScrollWheelAction(direction);
         }
     }
 }

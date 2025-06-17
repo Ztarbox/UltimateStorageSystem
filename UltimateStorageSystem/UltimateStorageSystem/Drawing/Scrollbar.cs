@@ -20,105 +20,105 @@ namespace UltimateStorageSystem.Drawing
         public Scrollbar(int x, int y, IScrollableTable table)
         {
             this.table = table;
-            scrollBarRunner = new Rectangle(x - 5, y + 40, 20, 400);
-            scrollBar = new Rectangle(scrollBarRunner.X, scrollBarRunner.Y, 20, 20);
+            this.scrollBarRunner = new Rectangle(x - 5, y + 40, 20, 400);
+            this.scrollBar = new Rectangle(this.scrollBarRunner.X, this.scrollBarRunner.Y, 20, 20);
         }
 
         public void Draw(SpriteBatch b)
         {
-            b.Draw(Game1.staminaRect, new Rectangle(scrollBarRunner.X, scrollBarRunner.Y, scrollBarRunner.Width, scrollBarRunner.Height), Color.Gray);
-            b.Draw(Game1.staminaRect, scrollBar, Color.White);
+            b.Draw(Game1.staminaRect, new Rectangle(this.scrollBarRunner.X, this.scrollBarRunner.Y, this.scrollBarRunner.Width, this.scrollBarRunner.Height), Color.Gray);
+            b.Draw(Game1.staminaRect, this.scrollBar, Color.White);
         }
 
         public void ReceiveLeftClick(int x, int y)
         {
-            if (scrollBar.Contains(x, y))
+            if (this.scrollBar.Contains(x, y))
             {
-                isScrolling = true;
-                dragOffset = y - scrollBar.Y;
+                this.isScrolling = true;
+                this.dragOffset = y - this.scrollBar.Y;
             }
-            else if (scrollBarRunner.Contains(x, y))
+            else if (this.scrollBarRunner.Contains(x, y))
             {
-                isScrolling = true;
-                dragOffset = scrollBar.Height / 2;
-                HandleDrag(y);
+                this.isScrolling = true;
+                this.dragOffset = this.scrollBar.Height / 2;
+                this.HandleDrag(y);
             }
         }
 
         public void LeftClickHeld(int x, int y)
         {
-            if (isScrolling)
+            if (this.isScrolling)
             {
-                HandleDrag(y);
+                this.HandleDrag(y);
             }
         }
 
         public void ReleaseLeftClick(int _x, int _y)
         {
-            isScrolling = false;
+            this.isScrolling = false;
         }
 
         public void ReceiveScrollWheelAction(int direction)
         {
             int scrollAmount = ((direction <= 0) ? 1 : (-1));
-            int itemCount = table.GetItemEntriesCount();
-            int visibleRows = table.GetVisibleRows();
-            table.ScrollIndex = Math.Clamp(table.ScrollIndex + scrollAmount, 0, Math.Max(0, itemCount - visibleRows));
-            UpdateScrollBarPosition();
+            int itemCount = this.table.GetItemEntriesCount();
+            int visibleRows = this.table.GetVisibleRows();
+            this.table.ScrollIndex = Math.Clamp(this.table.ScrollIndex + scrollAmount, 0, Math.Max(0, itemCount - visibleRows));
+            this.UpdateScrollBarPosition();
         }
 
         public void UpdatePosition(float proportionVisible, int scrollIndex, int maxScrollIndex)
         {
-            scrollBar.Height = (int)(scrollBarRunner.Height * proportionVisible);
+            this.scrollBar.Height = (int)(this.scrollBarRunner.Height * proportionVisible);
             float percent = scrollIndex / (float)maxScrollIndex;
-            scrollBar.Y = scrollBarRunner.Y + (int)(percent * (scrollBarRunner.Height - scrollBar.Height));
+            this.scrollBar.Y = this.scrollBarRunner.Y + (int)(percent * (this.scrollBarRunner.Height - this.scrollBar.Height));
         }
 
         public void SetToMaxSize()
         {
-            scrollBar.Y = scrollBarRunner.Y;
-            scrollBar.Height = scrollBarRunner.Height;
+            this.scrollBar.Y = this.scrollBarRunner.Y;
+            this.scrollBar.Height = this.scrollBarRunner.Height;
         }
 
         private void UpdateScrollBar(int y)
         {
-            float percent = (y - scrollBarRunner.Y) / (float)(scrollBarRunner.Height - scrollBar.Height);
-            int itemCount = table.GetItemEntriesCount();
-            int visibleRows = table.GetVisibleRows();
-            table.ScrollIndex = (int)(percent * Math.Max(0, itemCount - visibleRows));
-            table.ScrollIndex = Math.Clamp(table.ScrollIndex, 0, Math.Max(0, itemCount - visibleRows));
-            UpdateScrollBarPosition();
+            float percent = (y - this.scrollBarRunner.Y) / (float)(this.scrollBarRunner.Height - this.scrollBar.Height);
+            int itemCount = this.table.GetItemEntriesCount();
+            int visibleRows = this.table.GetVisibleRows();
+            this.table.ScrollIndex = (int)(percent * Math.Max(0, itemCount - visibleRows));
+            this.table.ScrollIndex = Math.Clamp(this.table.ScrollIndex, 0, Math.Max(0, itemCount - visibleRows));
+            this.UpdateScrollBarPosition();
         }
 
         public void UpdateScrollBarPosition()
         {
-            int itemCount = table.GetItemEntriesCount();
-            int visibleRows = table.GetVisibleRows();
+            int itemCount = this.table.GetItemEntriesCount();
+            int visibleRows = this.table.GetVisibleRows();
             if (itemCount > visibleRows)
             {
                 float proportionVisible = visibleRows / (float)itemCount;
-                UpdatePosition(proportionVisible, table.ScrollIndex, itemCount - visibleRows);
+                this.UpdatePosition(proportionVisible, this.table.ScrollIndex, itemCount - visibleRows);
             }
             else
             {
-                SetToMaxSize();
+                this.SetToMaxSize();
             }
         }
 
         private void HandleDrag(int mouseY)
         {
-            int runnerHeight = scrollBarRunner.Height;
-            int barHeight = scrollBar.Height;
-            float relative = mouseY - scrollBarRunner.Y - dragOffset;
+            int runnerHeight = this.scrollBarRunner.Height;
+            int barHeight = this.scrollBar.Height;
+            float relative = mouseY - this.scrollBarRunner.Y - this.dragOffset;
             relative = Math.Clamp(relative, 0f, runnerHeight - barHeight);
-            int itemCount = table.GetItemEntriesCount();
-            int visibleRows = table.GetVisibleRows();
+            int itemCount = this.table.GetItemEntriesCount();
+            int visibleRows = this.table.GetVisibleRows();
             if (itemCount > visibleRows)
             {
                 float pct = relative / (runnerHeight - barHeight);
                 int maxScroll = itemCount - visibleRows;
-                table.ScrollIndex = Math.Clamp((int)(pct * maxScroll), 0, maxScroll);
-                UpdateScrollBarPosition();
+                this.table.ScrollIndex = Math.Clamp((int)(pct * maxScroll), 0, maxScroll);
+                this.UpdateScrollBarPosition();
             }
         }
     }

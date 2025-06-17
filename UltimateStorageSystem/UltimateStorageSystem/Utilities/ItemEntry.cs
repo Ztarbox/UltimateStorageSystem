@@ -12,15 +12,15 @@ namespace UltimateStorageSystem.Utilities
 
         public int TotalValue { get; set; }
 
-        public Item Item { get; set; }
+        public Item? Item { get; set; }
 
-        public ItemEntry(string name, int quantity, int singleValue, int totalValue, Item item = null)
+        public ItemEntry(string name, int quantity, int singleValue, int totalValue, Item? item = null)
         {
-            Name = name;
-            Quantity = quantity;
-            SingleValue = ((singleValue >= 0) ? singleValue : 0);
-            TotalValue = ((totalValue >= 0) ? totalValue : 0);
-            Item = item;
+            this.Name = name;
+            this.Quantity = quantity;
+            this.SingleValue = ((singleValue >= 0) ? singleValue : 0);
+            this.TotalValue = ((totalValue >= 0) ? totalValue : 0);
+            this.Item = item;
         }
     }
 }

@@ -8,32 +8,29 @@ namespace UltimateStorageSystem.Utilities
     {
         private readonly IModHelper helper;
 
-        private readonly IMonitor monitor;
-
         private readonly HashSet<string> visitedLocationNames = new();
 
         public VisitedLocationManager(IModHelper helper)
         {
             this.helper = helper;
-            monitor = monitor;
-            helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
-            helper.Events.Player.Warped += OnWarped;
+            helper.Events.GameLoop.SaveLoaded += this.OnSaveLoaded;
+            helper.Events.Player.Warped += this.OnWarped;
         }
 
-        private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
+        private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
         {
-            List<string> saved = helper.Data.ReadSaveData<List<string>>("visitedLocations");
+            var saved = this.helper.Data.ReadSaveData<List<string>>("visitedLocations");
             if (saved != null)
             {
-                visitedLocationNames.Clear();
+                this.visitedLocationNames.Clear();
                 foreach (string name in saved)
                 {
-                    visitedLocationNames.Add(name);
+                    this.visitedLocationNames.Add(name);
                 }
             }
             foreach (GameLocation loc in Game1.locations)
             {
-                AddAndSave(loc.NameOrUniqueName);
+                this.AddAndSave(loc.NameOrUniqueName);
             }
             string[] knownExtraVanillaLocations = new string[14]
             {
@@ -46,34 +43,34 @@ namespace UltimateStorageSystem.Utilities
                 GameLocation loc2 = Game1.getLocationFromName(name2);
                 if (loc2 != null)
                 {
-                    AddAndSave(name2);
+                    this.AddAndSave(name2);
                 }
             }
             if (Game1.player?.currentLocation != null)
             {
-                AddAndSave(Game1.player.currentLocation.NameOrUniqueName);
+                this.AddAndSave(Game1.player.currentLocation.NameOrUniqueName);
             }
         }
 
-        private void OnWarped(object sender, WarpedEventArgs e)
+        private void OnWarped(object? sender, WarpedEventArgs e)
         {
             if (e.NewLocation != null && !string.IsNullOrEmpty(e.NewLocation.NameOrUniqueName))
             {
-                AddAndSave(e.NewLocation.NameOrUniqueName);
+                this.AddAndSave(e.NewLocation.NameOrUniqueName);
             }
         }
 
         private void AddAndSave(string name)
         {
-            if (!string.IsNullOrWhiteSpace(name) && visitedLocationNames.Add(name))
+            if (!string.IsNullOrWhiteSpace(name) && this.visitedLocationNames.Add(name))
             {
-                helper.Data.WriteSaveData<List<string>>("visitedLocations", new List<string>(visitedLocationNames));
+                this.helper.Data.WriteSaveData<List<string>>("visitedLocations", new List<string>(this.visitedLocationNames));
             }
         }
 
         public IEnumerable<GameLocation> GetVisitedLocations()
         {
-            foreach (string name in visitedLocationNames)
+            foreach (string name in this.visitedLocationNames)
             {
                 GameLocation loc = Game1.getLocationFromName(name);
                 if (loc != null)

@@ -16,10 +16,6 @@ namespace UltimateStorageSystem.Drawing
 
         private Scrollbar scrollbar;
 
-        private int containerWidth;
-
-        private int containerHeight;
-
         private int computerMenuHeight;
 
         private int inventoryMenuWidth;
@@ -28,11 +24,11 @@ namespace UltimateStorageSystem.Drawing
 
         private List<CraftingRecipe> cookingRecipes;
 
-        public InputHandler inputHandler;
+        public InputHandler? inputHandler;
 
         public bool cookMode = false;
 
-        private CraftingRecipe currentRecipe = null;
+        private CraftingRecipe? currentRecipe = null;
 
         private int maxCookable = 0;
 
@@ -45,17 +41,15 @@ namespace UltimateStorageSystem.Drawing
         public CookingTab(int xPositionOnScreen, int yPositionOnScreen, int containerWidth, int containerHeight, FarmLinkTerminalMenu terminalMenu)
             : base(xPositionOnScreen, yPositionOnScreen, containerWidth, containerHeight)
         {
-            TerminalMenu = terminalMenu;
-            this.containerWidth = containerWidth;
-            this.containerHeight = containerHeight;
-            computerMenuHeight = containerHeight - inventoryMenuHeight;
+            this.TerminalMenu = terminalMenu;
+            this.computerMenuHeight = containerHeight - this.inventoryMenuHeight;
             int slotsPerRow = 12;
             int slotSize = 64;
-            inventoryMenuWidth = slotsPerRow * slotSize;
-            int inventoryMenuX = base.xPositionOnScreen + (containerWidth - inventoryMenuWidth) / 2 - 90;
-            int inventoryMenuY = base.yPositionOnScreen + computerMenuHeight + 70;
-            playerInventoryMenu = new InventoryMenu(inventoryMenuX, inventoryMenuY, playerInventory: false);
-            cookingRecipes = Game1.player.cookingRecipes.Keys.Select((string name) => new CraftingRecipe(name, isCookingRecipe: true)).ToList();
+            this.inventoryMenuWidth = slotsPerRow * slotSize;
+            int inventoryMenuX = base.xPositionOnScreen + (containerWidth - this.inventoryMenuWidth) / 2 - 90;
+            int inventoryMenuY = base.yPositionOnScreen + this.computerMenuHeight + 70;
+            this.playerInventoryMenu = new InventoryMenu(inventoryMenuX, inventoryMenuY, playerInventory: false);
+            this.cookingRecipes = Game1.player.cookingRecipes.Keys.Select(name => new CraftingRecipe(name, isCookingRecipe: true)).ToList();
             List<string> columnHeaders = new()
             {
 
@@ -66,15 +60,15 @@ namespace UltimateStorageSystem.Drawing
             };
             List<int> columnWidths = new() { 250, 230, 280, 100 };
             List<bool> columnAlignments = new() { false, false, false, true };
-            List<TableRowWithIcon> tableRows = GenerateRecipeData();
-            CookingTable = new DynamicTable(xPositionOnScreen + 30, yPositionOnScreen + 40, columnHeaders, columnWidths, columnAlignments, tableRows, scrollbar);
-            scrollbar = new Scrollbar(xPositionOnScreen + containerWidth - 50, yPositionOnScreen + 103, CookingTable);
-            CookingTable.scrollbar = scrollbar;
+            List<TableRowWithIcon> tableRows = this.GenerateRecipeData();
+            this.CookingTable = new DynamicTable(xPositionOnScreen + 30, yPositionOnScreen + 40, columnHeaders, columnWidths, columnAlignments, tableRows, this.scrollbar);
+            this.scrollbar = new Scrollbar(xPositionOnScreen + containerWidth - 50, yPositionOnScreen + 103, this.CookingTable);
+            this.CookingTable.Scrollbar = this.scrollbar;
         }
 
         public void ResetSort()
         {
-            CookingTable?.ResetSort();
+            this.CookingTable?.ResetSort();
         }
 
         private List<TableRowWithIcon> GenerateRecipeData()
@@ -86,9 +80,9 @@ namespace UltimateStorageSystem.Drawing
                 if (craftingRecipe.createItem() is StardewValley.Object { QualifiedItemId: "0" } dish)
                 {
                     string recipeName = craftingRecipe.DisplayName;
-                    string buffs = GetRecipeBuffs(craftingRecipe);
-                    string ingredients = GetRecipeIngredients(craftingRecipe);
-                    string maxQuantity = craftingRecipe.getCraftableCount(TerminalMenu.GetAllStorageObjects()).ToString();
+                    string buffs = this.GetRecipeBuffs(craftingRecipe);
+                    string ingredients = this.GetRecipeIngredients(craftingRecipe);
+                    string maxQuantity = craftingRecipe.getCraftableCount(this.TerminalMenu.GetAllStorageObjects()).ToString();
                     rows.Add(new TableRowWithIcon(dish, new List<string> { recipeName, buffs, ingredients, maxQuantity }));
                 }
             }
@@ -117,31 +111,8 @@ namespace UltimateStorageSystem.Drawing
 
         private string GetRecipeIngredients(CraftingRecipe craftingRecipe)
         {
-            IEnumerable<string> names = craftingRecipe.recipeList.Select((KeyValuePair<string, int> kv) => $"{craftingRecipe.getNameFromIndex(kv.Key)} ({kv.Value})");
+            IEnumerable<string> names = craftingRecipe.recipeList.Select(kv => $"{craftingRecipe.getNameFromIndex(kv.Key)} ({kv.Value})");
             return string.Join(", ", names);
-        }
-
-        private string GetCategoryName(int categoryId)
-        {
-            if (1 == 0)
-            {
-            }
-            string text = categoryId switch
-            {
-                -5 => "Category_Egg",
-                -4 => "Category_Fish",
-                -6 => "Category_Milk",
-                _ => null,
-            };
-            if (1 == 0)
-            {
-            }
-            string key = text;
-            if (key != null)
-            {
-                return Game1.content.LoadString("Strings\\UI:" + key);
-            }
-            return Game1.content.LoadString("Strings\\UI:Category_Unknown");
         }
 
         public override void draw(SpriteBatch b)
@@ -150,11 +121,11 @@ namespace UltimateStorageSystem.Drawing
             int fixedWidth = 1000;
             int upperFrameHeight = 620;
             int inventoryFrameHeight = 280;
-            int tableWidth = CookingTable.ColumnWidths.Sum() + (CookingTable.ColumnWidths.Count - 1) * 10;
+            int tableWidth = this.CookingTable.ColumnWidths.Sum() + (this.CookingTable.ColumnWidths.Count - 1) * 10;
             string title = "ULTIMATE COOKING SYSTEM";
             float scale = 0.8f;
             Vector2 titleSize = Game1.dialogueFont.MeasureString(title) * scale;
-            Vector2 titlePosition = new(xPositionOnScreen + tableWidth - titleSize.X + 75f, yPositionOnScreen + 30);
+            Vector2 titlePosition = new(this.xPositionOnScreen + tableWidth - titleSize.X + 75f, this.yPositionOnScreen + 30);
             Color titleColor = Color.Orange;
             Color titleShadowColor = Color.Brown;
             for (int dx = -1; dx <= 1; dx++)
@@ -165,39 +136,39 @@ namespace UltimateStorageSystem.Drawing
                 }
             }
             b.DrawString(Game1.dialogueFont, title, titlePosition, titleColor, 0f, Vector2.Zero, scale, SpriteEffects.None, 0.86f);
-            CookingTable.Draw(b);
-            IClickableMenu.drawTextureBox(b, xPositionOnScreen, yPositionOnScreen + upperFrameHeight - 60, fixedWidth, inventoryFrameHeight - 30, Color.White);
-            playerInventoryMenu.draw(b);
-            if (cookMode && currentRecipe != null)
+            this.CookingTable.Draw(b);
+            IClickableMenu.drawTextureBox(b, this.xPositionOnScreen, this.yPositionOnScreen + upperFrameHeight - 60, fixedWidth, inventoryFrameHeight - 30, Color.White);
+            this.playerInventoryMenu.draw(b);
+            if (this.cookMode && this.currentRecipe != null)
             {
                 Vector2 mousePos = new(Game1.getMouseX(), Game1.getMouseY());
-                Item icon = currentRecipe.createItem();
-                icon.Stack = cookAmount;
+                Item icon = this.currentRecipe.createItem();
+                icon.Stack = this.cookAmount;
                 icon.drawInMenu(b, mousePos, 1f, 1f, 0.9f, StackDrawType.Draw, Color.White, drawShadow: false);
             }
-            drawMouse(b);
+            this.drawMouse(b);
         }
 
         public override void receiveLeftClick(int x, int y, bool playSound = true)
         {
-            if (cookMode && currentRecipe != null)
+            if (this.cookMode && this.currentRecipe != null)
             {
-                foreach (ClickableComponent slot in playerInventoryMenu.inventory)
+                foreach (ClickableComponent slot in this.playerInventoryMenu.inventory)
                 {
-                    if (slot.containsPoint(x, y) && playerInventoryMenu.actualInventory.Count > slot.myID)
+                    if (slot.containsPoint(x, y) && this.playerInventoryMenu.actualInventory.Count > slot.myID)
                     {
-                        Item existingItem = playerInventoryMenu.actualInventory[slot.myID];
-                        Item result = currentRecipe.createItem();
+                        Item existingItem = this.playerInventoryMenu.actualInventory[slot.myID];
+                        Item result = this.currentRecipe.createItem();
                         if (result == null)
                         {
                             Game1.playSound("cancel");
                         }
                         else
                         {
-                            result.Stack = cookAmount;
+                            result.Stack = this.cookAmount;
                             if (existingItem == null)
                             {
-                                playerInventoryMenu.actualInventory[slot.myID] = result;
+                                this.playerInventoryMenu.actualInventory[slot.myID] = result;
                                 Game1.playSound("coin");
                             }
                             else
@@ -227,13 +198,13 @@ namespace UltimateStorageSystem.Drawing
                                     Game1.playSound("coin");
                                 }
                             }
-                            List<IInventory> inventories = TerminalMenu.GetAllStorageObjects().Select((Func<Chest, IInventory>)((Chest ch) => ch.Items)).ToList();
-                            for (int i = 0; i < cookAmount; i++)
+                            List<IInventory> inventories = this.TerminalMenu.GetAllStorageObjects().Select((Func<Chest, IInventory>)(ch => ch.Items)).ToList();
+                            for (int i = 0; i < this.cookAmount; i++)
                             {
-                                ConsumeIngredientsPrioritized(currentRecipe, 1);
+                                this.ConsumeIngredientsPrioritized(this.currentRecipe, 1);
                             }
-                            UpdateCookingTable();
-                            cookMode = false;
+                            this.UpdateCookingTable();
+                            this.cookMode = false;
                         }
                         break;
                     }
@@ -241,28 +212,28 @@ namespace UltimateStorageSystem.Drawing
                 return;
             }
             base.receiveLeftClick(x, y, playSound);
-            scrollbar.ReceiveLeftClick(x, y);
-            Item clickedItem = CookingTable.GetClickedItem(x, y);
-            if (clickedItem == null || TerminalMenu == null)
+            this.scrollbar.ReceiveLeftClick(x, y);
+            var clickedItem = this.CookingTable.GetClickedItem(x, y);
+            if (clickedItem == null || this.TerminalMenu == null)
             {
                 return;
             }
-            CraftingRecipe recipe = cookingRecipes.FirstOrDefault((CraftingRecipe r) => r.name == clickedItem.Name || r.DisplayName == clickedItem.DisplayName);
+            var recipe = this.cookingRecipes.FirstOrDefault(r => r.name == clickedItem.Name || r.DisplayName == clickedItem.DisplayName);
             if (recipe == null)
             {
                 return;
             }
-            int maxCanCook = recipe.getCraftableCount(TerminalMenu.GetAllStorageObjects());
+            int maxCanCook = recipe.getCraftableCount(this.TerminalMenu.GetAllStorageObjects());
             if (maxCanCook <= 0)
             {
                 Game1.addHUDMessage(new HUDMessage(ModHelper.Helper.Translation.Get("not_enough_ingredients"), 3));
                 return;
             }
             int toCook = ((!Game1.oldKBState.IsKeyDown(Keys.LeftShift) && !Game1.oldKBState.IsKeyDown(Keys.RightShift)) ? 1 : Math.Min(5, maxCanCook));
-            List<IInventory> inventories2 = TerminalMenu.GetAllStorageObjects().Select((Func<Chest, IInventory>)((Chest ch) => ch.Items)).ToList();
+            List<IInventory> inventories2 = this.TerminalMenu.GetAllStorageObjects().Select((Func<Chest, IInventory>)(ch => ch.Items)).ToList();
             for (int i2 = 0; i2 < toCook; i2++)
             {
-                ConsumeIngredientsPrioritized(recipe, 1);
+                this.ConsumeIngredientsPrioritized(recipe, 1);
             }
             for (int i3 = 0; i3 < toCook; i3++)
             {
@@ -277,26 +248,26 @@ namespace UltimateStorageSystem.Drawing
                 }
             }
             Game1.playSound("coin");
-            UpdateCookingTable();
+            this.UpdateCookingTable();
         }
 
         public override void receiveRightClick(int x, int y, bool playSound = true)
         {
-            if (!cookMode)
+            if (!this.cookMode)
             {
-                Item clickedItem = CookingTable.GetClickedItem(x, y);
+                var clickedItem = this.CookingTable.GetClickedItem(x, y);
                 if (clickedItem != null)
                 {
-                    CraftingRecipe recipe = cookingRecipes.FirstOrDefault((CraftingRecipe r) => r.name == clickedItem.Name || r.DisplayName == clickedItem.DisplayName);
+                    var recipe = this.cookingRecipes.FirstOrDefault(r => r.name == clickedItem.Name || r.DisplayName == clickedItem.DisplayName);
                     if (recipe != null)
                     {
-                        int max = recipe.getCraftableCount(TerminalMenu.GetAllStorageObjects());
+                        int max = recipe.getCraftableCount(this.TerminalMenu.GetAllStorageObjects());
                         if (max > 0)
                         {
-                            cookMode = true;
-                            currentRecipe = recipe;
-                            maxCookable = max;
-                            cookAmount = 1;
+                            this.cookMode = true;
+                            this.currentRecipe = recipe;
+                            this.maxCookable = max;
+                            this.cookAmount = 1;
                             Game1.playSound("shiny4");
                         }
                         else
@@ -313,31 +284,29 @@ namespace UltimateStorageSystem.Drawing
         public override void performHoverAction(int x, int y)
         {
             base.performHoverAction(x, y);
-            CookingTable.PerformHoverAction(x, y);
         }
 
         public override void receiveScrollWheelAction(int direction)
         {
-            if (cookMode)
+            if (this.cookMode)
             {
-                cookAmount = Math.Clamp(cookAmount + ((direction > 0) ? 1 : (-1)), 1, maxCookable);
+                this.cookAmount = Math.Clamp(this.cookAmount + ((direction > 0) ? 1 : (-1)), 1, this.maxCookable);
                 return;
             }
-            CookingTable.ReceiveScrollWheelAction(direction);
-            scrollbar.UpdateScrollBarPosition();
+            this.CookingTable.ReceiveScrollWheelAction(direction);
+            this.scrollbar.UpdateScrollBarPosition();
         }
 
         public void LeftClickHeld(int x, int y)
         {
-            CookingTable.PerformHoverAction(x, y);
-            scrollbar.LeftClickHeld(x, y);
+            this.scrollbar.LeftClickHeld(x, y);
         }
 
         public override void receiveKeyPress(Keys key)
         {
-            if (cookMode && key == Keys.Escape)
+            if (this.cookMode && key == Keys.Escape)
             {
-                cookMode = false;
+                this.cookMode = false;
                 Game1.playSound("cancel");
             }
             else
@@ -348,26 +317,26 @@ namespace UltimateStorageSystem.Drawing
 
         private void UpdateCookingTable()
         {
-            string sortCol = CookingTable.sortedColumn;
-            bool asc = CookingTable.isAscending;
-            int scroll = CookingTable.ScrollIndex;
-            foreach (TableRowWithIcon row in CookingTable.AllRows)
+            var sortCol = this.CookingTable.SortedColumn;
+            bool asc = this.CookingTable.isAscending;
+            int scroll = this.CookingTable.ScrollIndex;
+            foreach (TableRowWithIcon row in this.CookingTable.AllRows)
             {
                 int idx = (row.ItemIcon as StardewValley.Object)?.ParentSheetIndex ?? (-1);
-                CraftingRecipe recipe = cookingRecipes.FirstOrDefault(delegate (CraftingRecipe r)
+                var recipe = this.cookingRecipes.FirstOrDefault(delegate (CraftingRecipe r)
                 {
-                    StardewValley.Object obj = r.createItem() as StardewValley.Object;
+                    var obj = r.createItem() as StardewValley.Object;
                     return obj != null && obj.ParentSheetIndex == idx;
                 });
                 if (recipe != null)
                 {
-                    int maxQty = recipe.getCraftableCount(TerminalMenu.GetAllStorageObjects());
+                    int maxQty = recipe.getCraftableCount(this.TerminalMenu.GetAllStorageObjects());
                     row.Cells[3] = maxQty.ToString();
                 }
             }
-            CookingTable.SortItemsBy(sortCol, asc);
-            CookingTable.ScrollIndex = Math.Clamp(scroll, 0, Math.Max(0, CookingTable.GetItemEntriesCount() - CookingTable.GetVisibleRows()));
-            CookingTable.scrollbar.UpdateScrollBarPosition();
+            this.CookingTable.SortItemsBy(sortCol, asc);
+            this.CookingTable.ScrollIndex = Math.Clamp(scroll, 0, Math.Max(0, this.CookingTable.GetItemEntriesCount() - this.CookingTable.GetVisibleRows()));
+            this.CookingTable.Scrollbar?.UpdateScrollBarPosition();
         }
 
         private void ConsumeIngredientsPrioritized(CraftingRecipe recipe, int amount)
@@ -390,7 +359,7 @@ namespace UltimateStorageSystem.Drawing
                         isPlayer = true
                     })
                     .Concat(
-                        TerminalMenu.GetAllStorageObjects()
+                        this.TerminalMenu.GetAllStorageObjects()
                             .SelectMany(chest => chest.Items
                                 .Select((item, idx) => new { item, idx, chest })
                                 .Where(x => x.item is StardewValley.Object obj && CraftingRecipe.ItemMatchesForCrafting(obj, rawId))
@@ -431,8 +400,8 @@ namespace UltimateStorageSystem.Drawing
         public override void update(GameTime time)
         {
             base.update(time);
-            CookingTable.Update();
-            scrollbar.UpdateScrollBarPosition();
+            this.CookingTable.Update();
+            this.scrollbar.UpdateScrollBarPosition();
         }
     }
 }

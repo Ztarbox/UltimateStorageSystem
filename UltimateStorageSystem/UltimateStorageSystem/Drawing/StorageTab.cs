@@ -18,17 +18,13 @@ namespace UltimateStorageSystem.Drawing
 
         private Scrollbar scrollbar;
 
-        public InputHandler inputHandler;
+        public InputHandler? inputHandler;
 
         private ItemTransferManager itemTransferManager;
 
         private List<Item> unsortedItems;
 
         private List<ItemEntry> aggregatedItems;
-
-        private int containerWidth;
-
-        private int containerHeight;
 
         private int computerMenuHeight;
 
@@ -44,13 +40,11 @@ namespace UltimateStorageSystem.Drawing
             : base(xPositionOnScreen, yPositionOnScreen, containerWidth, containerHeight)
         {
             this.terminalMenu = terminalMenu;
-            this.containerWidth = containerWidth;
-            this.containerHeight = containerHeight;
-            computerMenuHeight = containerHeight - inventoryMenuHeight;
-            (List<Item>, List<ItemEntry>) storageData = CollectAllChestItems();
-            unsortedItems = storageData.Item1;
-            aggregatedItems = storageData.Item2;
-            columnHeaders = new List<string>
+            this.computerMenuHeight = containerHeight - this.inventoryMenuHeight;
+            (List<Item>, List<ItemEntry>) storageData = this.CollectAllChestItems();
+            this.unsortedItems = storageData.Item1;
+            this.aggregatedItems = storageData.Item2;
+            this.columnHeaders = new List<string>
             {
                 ModHelper.Helper.Translation.Get("column.item"),
                 ModHelper.Helper.Translation.Get("column.qty"),
@@ -59,31 +53,31 @@ namespace UltimateStorageSystem.Drawing
             };
             List<int> columnWidths = new() { 400, 150, 110, 200 };
             List<bool> columnAlignments = new() { false, true, true, true };
-            List<TableRowWithIcon> tableRows = aggregatedItems.Select((ItemEntry entry) => new TableRowWithIcon(entry.Item, new List<string>
+            List<TableRowWithIcon> tableRows = this.aggregatedItems.Select(entry => new TableRowWithIcon(entry.Item, new List<string>
             {
                 entry.Name,
                 entry.Quantity.ToString(),
                 entry.SingleValue.ToString(),
                 entry.TotalValue.ToString()
             })).ToList();
-            ItemTable = new DynamicTable(xPositionOnScreen + 30, yPositionOnScreen + 40, columnHeaders, columnWidths, columnAlignments, tableRows, null);
-            scrollbar = new Scrollbar(xPositionOnScreen + containerWidth - 50, yPositionOnScreen + 103, ItemTable);
-            ItemTable.scrollbar = scrollbar;
+            this.ItemTable = new DynamicTable(xPositionOnScreen + 30, yPositionOnScreen + 40, this.columnHeaders, columnWidths, columnAlignments, tableRows, null);
+            this.scrollbar = new Scrollbar(xPositionOnScreen + containerWidth - 50, yPositionOnScreen + 103, this.ItemTable);
+            this.ItemTable.Scrollbar = this.scrollbar;
             List<Chest> chests = terminalMenu.GetAllStorageObjects();
-            itemTransferManager = new ItemTransferManager(chests, ItemTable);
-            itemTransferManager.UpdateChestItemsAndSort();
-            scrollbar.UpdateScrollBarPosition();
+            this.itemTransferManager = new ItemTransferManager(chests, this.ItemTable);
+            this.itemTransferManager.UpdateChestItemsAndSort();
+            this.scrollbar.UpdateScrollBarPosition();
             int slotsPerRow = 12;
             int slotSize = 64;
-            inventoryMenuWidth = slotsPerRow * slotSize;
-            int inventoryMenuX = base.xPositionOnScreen + (containerWidth - inventoryMenuWidth) / 2 - 90;
-            int inventoryMenuY = base.yPositionOnScreen + computerMenuHeight + 70;
-            playerInventoryMenu = new InventoryMenu(inventoryMenuX, inventoryMenuY, playerInventory: false);
+            this.inventoryMenuWidth = slotsPerRow * slotSize;
+            int inventoryMenuX = base.xPositionOnScreen + (containerWidth - this.inventoryMenuWidth) / 2 - 90;
+            int inventoryMenuY = base.yPositionOnScreen + this.computerMenuHeight + 70;
+            this.playerInventoryMenu = new InventoryMenu(inventoryMenuX, inventoryMenuY, playerInventory: false);
         }
 
         private bool IsBlockedChest(Chest chest)
         {
-            return chest.Items.Any((Item item) => item is StardewValley.Object obj && obj.QualifiedItemId == "(BC)holybananapants.UltimateStorageSystemContentPack_BlockTerminal");
+            return chest.Items.Any(item => item is StardewValley.Object obj && obj.QualifiedItemId == "(BC)holybananapants.UltimateStorageSystemContentPack_BlockTerminal");
         }
 
         private (List<Item> unsortedItems, List<ItemEntry> aggregatedItems) CollectAllChestItems()
@@ -94,7 +88,7 @@ namespace UltimateStorageSystem.Drawing
             {
                 foreach (StardewValley.Object obj in location.Objects.Values)
                 {
-                    if (!(obj is Chest chest) || chest.Items.Count <= 0 || IsBlockedChest(chest))
+                    if (!(obj is Chest chest) || chest.Items.Count <= 0 || this.IsBlockedChest(chest))
                     {
                         continue;
                     }
@@ -121,7 +115,7 @@ namespace UltimateStorageSystem.Drawing
                     continue;
                 }
                 Chest fridgeChest = farmHouse.fridge.Value;
-                if (fridgeChest == null || IsBlockedChest(fridgeChest))
+                if (fridgeChest == null || this.IsBlockedChest(fridgeChest))
                 {
                     continue;
                 }
@@ -151,12 +145,12 @@ namespace UltimateStorageSystem.Drawing
 
         public void TransferItemToPlayerInventory(Item item)
         {
-            itemTransferManager.TransferFromChestsToInventory(item, item.Stack);
+            this.itemTransferManager.TransferFromChestsToInventory(item, item.Stack);
         }
 
         public void TransferItemToChest(Item item)
         {
-            itemTransferManager.TransferFromInventoryToChests(item, item.Stack);
+            this.itemTransferManager.TransferFromInventoryToChests(item, item.Stack);
         }
 
         public override void draw(SpriteBatch b)
@@ -168,16 +162,16 @@ namespace UltimateStorageSystem.Drawing
                 ModHelper.Helper.Translation.Get("column.item") ?? "Value",
                 ModHelper.Helper.Translation.Get("column.item") ?? "Total"
             };
-            columnHeaders = list;
+            this.columnHeaders = list;
             base.draw(b);
             int fixedWidth = 1000;
             int upperFrameHeight = 620;
             int inventoryFrameHeight = 280;
-            int tableWidth = ItemTable.ColumnWidths.Sum() + (ItemTable.ColumnWidths.Count - 1) * 10;
+            int tableWidth = this.ItemTable.ColumnWidths.Sum() + (this.ItemTable.ColumnWidths.Count - 1) * 10;
             string title = "ULTIMATE STORAGE SYSTEM";
             float scale = 0.8f;
             Vector2 titleSize = Game1.dialogueFont.MeasureString(title) * scale;
-            Vector2 titlePosition = new(xPositionOnScreen + tableWidth - titleSize.X + 75f, yPositionOnScreen + 30);
+            Vector2 titlePosition = new(this.xPositionOnScreen + tableWidth - titleSize.X + 75f, this.yPositionOnScreen + 30);
             Color titleColor = Color.Orange;
             Color titleShadowColor = Color.Brown;
             for (int dx = -1; dx <= 1; dx++)
@@ -188,30 +182,30 @@ namespace UltimateStorageSystem.Drawing
                 }
             }
             b.DrawString(Game1.dialogueFont, title, titlePosition, titleColor, 0f, Vector2.Zero, scale, SpriteEffects.None, 0.86f);
-            ItemTable.Draw(b);
-            IClickableMenu.drawTextureBox(b, xPositionOnScreen, yPositionOnScreen + upperFrameHeight - 60, fixedWidth, inventoryFrameHeight - 30, Color.White);
-            playerInventoryMenu.draw(b);
-            drawMouse(b);
+            this.ItemTable.Draw(b);
+            IClickableMenu.drawTextureBox(b, this.xPositionOnScreen, this.yPositionOnScreen + upperFrameHeight - 60, fixedWidth, inventoryFrameHeight - 30, Color.White);
+            this.playerInventoryMenu.draw(b);
+            this.drawMouse(b);
         }
 
         public override void receiveLeftClick(int x, int y, bool playSound = true)
         {
             base.receiveLeftClick(x, y, playSound);
             bool shiftPressed = Game1.oldKBState.IsKeyDown(Keys.LeftShift) || Game1.oldKBState.IsKeyDown(Keys.RightShift);
-            Item clickedItem = ItemTable.GetClickedItem(x, y);
+            var clickedItem = this.ItemTable.GetClickedItem(x, y);
             if (clickedItem != null)
             {
-                itemTransferManager.HandleLeftClick(clickedItem, isInInventory: false, shiftPressed);
+                this.itemTransferManager.HandleLeftClick(clickedItem, isInInventory: false, shiftPressed);
                 return;
             }
-            foreach (ClickableComponent slot in playerInventoryMenu.inventory)
+            foreach (ClickableComponent slot in this.playerInventoryMenu.inventory)
             {
-                if (slot.containsPoint(x, y) && playerInventoryMenu.actualInventory.Count > slot.myID)
+                if (slot.containsPoint(x, y) && this.playerInventoryMenu.actualInventory.Count > slot.myID)
                 {
-                    Item inventoryItem = playerInventoryMenu.actualInventory[slot.myID];
+                    Item inventoryItem = this.playerInventoryMenu.actualInventory[slot.myID];
                     if (inventoryItem != null)
                     {
-                        itemTransferManager.HandleLeftClick(inventoryItem, isInInventory: true, shiftPressed);
+                        this.itemTransferManager.HandleLeftClick(inventoryItem, isInInventory: true, shiftPressed);
                     }
                     break;
                 }
@@ -222,20 +216,20 @@ namespace UltimateStorageSystem.Drawing
         {
             base.receiveRightClick(x, y, playSound);
             bool shiftPressed = Game1.oldKBState.IsKeyDown(Keys.LeftShift) || Game1.oldKBState.IsKeyDown(Keys.RightShift);
-            Item clickedItem = ItemTable.GetClickedItem(x, y);
+            var clickedItem = this.ItemTable.GetClickedItem(x, y);
             if (clickedItem != null)
             {
-                itemTransferManager.HandleRightClick(clickedItem, isInInventory: false, shiftPressed);
+                this.itemTransferManager.HandleRightClick(clickedItem, isInInventory: false, shiftPressed);
                 return;
             }
-            foreach (ClickableComponent slot in playerInventoryMenu.inventory)
+            foreach (ClickableComponent slot in this.playerInventoryMenu.inventory)
             {
-                if (slot.containsPoint(x, y) && playerInventoryMenu.actualInventory.Count > slot.myID)
+                if (slot.containsPoint(x, y) && this.playerInventoryMenu.actualInventory.Count > slot.myID)
                 {
-                    Item inventoryItem = playerInventoryMenu.actualInventory[slot.myID];
+                    Item inventoryItem = this.playerInventoryMenu.actualInventory[slot.myID];
                     if (inventoryItem != null)
                     {
-                        itemTransferManager.HandleRightClick(inventoryItem, isInInventory: true, shiftPressed);
+                        this.itemTransferManager.HandleRightClick(inventoryItem, isInInventory: true, shiftPressed);
                     }
                     break;
                 }
@@ -245,15 +239,14 @@ namespace UltimateStorageSystem.Drawing
         public override void performHoverAction(int x, int y)
         {
             base.performHoverAction(x, y);
-            ItemTable.PerformHoverAction(x, y);
         }
 
         public override void receiveScrollWheelAction(int direction)
         {
             base.receiveScrollWheelAction(direction);
-            ItemTable.ReceiveScrollWheelAction(direction);
-            scrollbar.ReceiveScrollWheelAction(direction);
-            scrollbar.UpdateScrollBarPosition();
+            this.ItemTable.ReceiveScrollWheelAction(direction);
+            this.scrollbar.ReceiveScrollWheelAction(direction);
+            this.scrollbar.UpdateScrollBarPosition();
         }
 
         public override void receiveKeyPress(Keys key)
@@ -263,19 +256,19 @@ namespace UltimateStorageSystem.Drawing
 
         public void ResetSort()
         {
-            ItemTable?.ResetSort();
+            this.ItemTable?.ResetSort();
         }
 
         public override void update(GameTime time)
         {
             base.update(time);
-            ItemTable.Update();
-            scrollbar.UpdateScrollBarPosition();
+            this.ItemTable.Update();
+            this.scrollbar.UpdateScrollBarPosition();
         }
 
         public void RefreshItems()
         {
-            List<Chest> chests = terminalMenu.GetAllStorageObjects();
+            List<Chest> chests = this.terminalMenu.GetAllStorageObjects();
             Dictionary<string, ItemEntry> itemDict = new();
             foreach (Chest chest in chests)
             {
@@ -298,13 +291,13 @@ namespace UltimateStorageSystem.Drawing
                     }
                 }
             }
-            ItemTable.ClearItems();
+            this.ItemTable.ClearItems();
             foreach (ItemEntry entry2 in itemDict.Values)
             {
-                ItemTable.AddItem(entry2);
+                this.ItemTable.AddItem(entry2);
             }
-            ItemTable.Refresh();
-            scrollbar.UpdateScrollBarPosition();
+            this.ItemTable.Refresh();
+            this.scrollbar.UpdateScrollBarPosition();
         }
     }
 }

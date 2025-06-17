@@ -4,7 +4,7 @@ namespace UltimateStorageSystem.Interfaces
     {
         int ScrollIndex { get; set; }
 
-        string sortedColumn { get; }
+        string SortedColumn { get; }
 
         bool isAscending { get; }
 

@@ -71,17 +71,17 @@ namespace UltimateStorageSystem
             }
         }
 
-        public static ModEntry Instance;
+        public static ModEntry Instance = null!;
 
-        public static Texture2D basketTexture;
+        public static Texture2D basketTexture = null!;
 
-        public static Texture2D BlockerOverlayTexture;
+        public static Texture2D BlockerOverlayTexture = null!;
 
-        public static VisitedLocationManager LocationTracker;
+        public static VisitedLocationManager LocationTracker = null!;
 
         public bool ignoreNextRightClick = true;
 
-        private ModConfig config;
+        private ModConfig config = null!;
 
         private SButton? openTerminalHotkey;
 
@@ -95,88 +95,76 @@ namespace UltimateStorageSystem
             { "Dwarf", "Dwarf" }
         };
 
-        private static readonly Vector2[] AdjacentTilesOffsets = new Vector2[8]
-        {
-            new(-1f, 1f),
-            new(0f, 1f),
-            new(1f, 1f),
-            new(-1f, 0f),
-            new(1f, 0f),
-            new(-1f, -1f),
-            new(0f, -1f),
-            new(1f, -1f)
-        };
-
         public override void Entry(IModHelper helper)
         {
             Instance = this;
             ModHelper.Init(helper);
-            LoadConfig();
+            this.LoadConfig();
             basketTexture = helper.ModContent.Load<Texture2D>("assets/basket.png");
             BlockerOverlayTexture = helper.ModContent.Load<Texture2D>("assets/blockTerminal.png");
             LocationTracker = new VisitedLocationManager(helper);
             Harmony harmony = new(this.ModManifest.UniqueID);
             harmony.PatchAll(Assembly.GetExecutingAssembly());
-            helper.Events.GameLoop.GameLaunched += OnGameLaunched;
-            helper.Events.Input.ButtonPressed += OnButtonPressed;
-            helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
+            helper.Events.GameLoop.GameLaunched += this.OnGameLaunched;
+            helper.Events.Input.ButtonPressed += this.OnButtonPressed;
+            helper.Events.GameLoop.SaveLoaded += this.OnSaveLoaded;
         }
 
         private void LoadConfig()
         {
             try
             {
-                config = this.Helper.ReadConfig<ModConfig>();
-                openTerminalHotkey = config.OpenFarmLinkTerminalHotkey.GetValueOrDefault();
-                if (openTerminalHotkey == (SButton?)0)
+                this.config = this.Helper.ReadConfig<ModConfig>();
+                this.openTerminalHotkey = this.config.OpenFarmLinkTerminalHotkey.GetValueOrDefault();
+                if (this.openTerminalHotkey == (SButton?)0)
                 {
                     this.Monitor.Log("No hotkey is set for opening the FarmLink Terminal. You can set a hotkey in GenericModConfigMenu if desired.", (LogLevel)2);
                 }
-                OverrideShopData();
+                this.OverrideShopData();
             }
             catch
             {
-                openTerminalHotkey = 0;
+                this.openTerminalHotkey = 0;
             }
         }
 
         private void OverrideShopData()
         {
-            ShopDataManager.UpdateShopData(this.Helper, this.Monitor, config.TerminalPrice, config.Vendor);
+            ShopDataManager.UpdateShopData(this.Helper, this.Monitor, this.config.TerminalPrice, this.config.Vendor);
         }
 
-        private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
+        private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
         {
-            IGenericModConfigMenuApi configMenu = this.Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+            var configMenu = this.Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
             if (configMenu == null)
             {
                 return;
             }
             configMenu.Register(this.ModManifest, delegate
             {
-                config = new ModConfig();
+                this.config = new ModConfig();
             }, delegate
             {
                 //IL_004d: Unknown result type (might be due to invalid IL or missing references)
-                if (vendorMapping.TryGetValue(config.Vendor, out var value))
+                if (this.vendorMapping.TryGetValue(this.config.Vendor, out var value))
                 {
-                    config.Vendor = value;
+                    this.config.Vendor = value;
                 }
-                this.Helper.WriteConfig<ModConfig>(config);
-                openTerminalHotkey = config.OpenFarmLinkTerminalHotkey.GetValueOrDefault();
-                OverrideShopData();
+                this.Helper.WriteConfig<ModConfig>(this.config);
+                this.openTerminalHotkey = this.config.OpenFarmLinkTerminalHotkey.GetValueOrDefault();
+                this.OverrideShopData();
             });
             configMenu.AddSectionTitle(this.ModManifest, () => ModHelper.Helper.Translation.Get("menu.shopSettings"), () => ModHelper.Helper.Translation.Get("menu.shopSettingsTooltip"));
-            configMenu.AddTextOption(this.ModManifest, () => vendorMapping.FirstOrDefault((KeyValuePair<string, string> x) => x.Value == config.Vendor).Key ?? "Dwarf", delegate (string value)
+            configMenu.AddTextOption(this.ModManifest, () => this.vendorMapping.FirstOrDefault(x => x.Value == this.config.Vendor).Key ?? "Dwarf", delegate (string value)
             {
-                if (vendorMapping.TryGetValue(value, out var value2))
+                if (this.vendorMapping.TryGetValue(value, out var value2))
                 {
-                    config.Vendor = value2;
+                    this.config.Vendor = value2;
                 }
-            }, () => ModHelper.Helper.Translation.Get("menu.vendor"), () => ModHelper.Helper.Translation.Get("menu.vendorTooltip"), vendorMapping.Keys.ToArray());
-            configMenu.AddNumberOption(this.ModManifest, () => config.TerminalPrice, delegate (int value)
+            }, () => ModHelper.Helper.Translation.Get("menu.vendor"), () => ModHelper.Helper.Translation.Get("menu.vendorTooltip"), this.vendorMapping.Keys.ToArray());
+            configMenu.AddNumberOption(this.ModManifest, () => this.config.TerminalPrice, delegate (int value)
             {
-                config.TerminalPrice = value;
+                this.config.TerminalPrice = value;
             }, () => ModHelper.Helper.Translation.Get("menu.price"), () => ModHelper.Helper.Translation.Get("menu.priceTooltip"), 1, 100000, 1000);
             configMenu.AddParagraph(this.ModManifest, () => "");
             configMenu.AddParagraph(this.ModManifest, () => "");
@@ -184,48 +172,48 @@ namespace UltimateStorageSystem
             configMenu.AddParagraph(this.ModManifest, () => ModHelper.Helper.Translation.Get("menu.noticeContent"));
             configMenu.AddParagraph(this.ModManifest, () => ModHelper.Helper.Translation.Get("menu.command"));
             configMenu.AddSectionTitle(this.ModManifest, () => ModHelper.Helper.Translation.Get("menu.hotkeys"), () => ModHelper.Helper.Translation.Get("menu.hotkeysTooltip"));
-            configMenu.AddKeybind(this.ModManifest, () => config.OpenFarmLinkTerminalHotkey.GetValueOrDefault(), delegate (SButton value)
+            configMenu.AddKeybind(this.ModManifest, () => this.config.OpenFarmLinkTerminalHotkey.GetValueOrDefault(), delegate (SButton value)
             {
                 //IL_0007: Unknown result type (might be due to invalid IL or missing references)
                 //IL_0014: Unknown result type (might be due to invalid IL or missing references)
-                config.OpenFarmLinkTerminalHotkey = value;
-                openTerminalHotkey = value;
+                this.config.OpenFarmLinkTerminalHotkey = value;
+                this.openTerminalHotkey = value;
             }, () => ModHelper.Helper.Translation.Get("menu.hotkeyOpen"), () => ModHelper.Helper.Translation.Get("menu.hotkeyOpenTooltip"));
         }
 
-        private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
+        private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
         {
-            LoadConfig();
+            this.LoadConfig();
         }
 
-        private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
+        private void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
         {
-            if (openTerminalHotkey.HasValue && Context.IsPlayerFree && (SButton?)e.Button == openTerminalHotkey)
+            if (this.openTerminalHotkey.HasValue && Context.IsPlayerFree && (SButton?)e.Button == this.openTerminalHotkey)
             {
-                ignoreNextRightClick = false;
-                if (IsFarmLinkTerminalPlaced())
+                this.ignoreNextRightClick = false;
+                if (this.IsFarmLinkTerminalPlaced())
                 {
-                    OpenFarmLinkTerminalMenu();
+                    this.OpenFarmLinkTerminalMenu();
                 }
             }
             if (Context.IsPlayerFree && SButtonExtensions.IsActionButton(e.Button))
             {
                 Vector2 tile = e.Cursor.Tile;
-                if (IsFarmLinkTerminalOnTile(tile, out var terminalObject) && FarmLinkTerminal.IsPlayerBelowTileAndFacingUp(Game1.player, terminalObject.TileLocation))
+                if (this.IsFarmLinkTerminalOnTile(tile, out var terminalObject) && FarmLinkTerminal.IsPlayerBelowTileAndFacingUp(Game1.player, terminalObject.TileLocation))
                 {
-                    ignoreNextRightClick = true;
-                    OpenFarmLinkTerminalMenu();
+                    this.ignoreNextRightClick = true;
+                    this.OpenFarmLinkTerminalMenu();
                 }
             }
         }
 
         private bool IsFarmLinkTerminalPlaced()
         {
-            if (Game1.locations.OfType<FarmHouse>().Any((FarmHouse location) => location.objects.Values.Any((StardewValley.Object obj) => obj.Name == farmLinkTerminalName)))
+            if (Game1.locations.OfType<FarmHouse>().Any(location => location.objects.Values.Any(obj => obj.Name == this.farmLinkTerminalName)))
             {
                 return true;
             }
-            if (Game1.locations.OfType<Farm>().Any((Farm location) => location.objects.Values.Any((StardewValley.Object obj) => obj.Name == farmLinkTerminalName)))
+            if (Game1.locations.OfType<Farm>().Any(location => location.objects.Values.Any(obj => obj.Name == this.farmLinkTerminalName)))
             {
                 return true;
             }
@@ -234,7 +222,7 @@ namespace UltimateStorageSystem
 
         private bool IsFarmLinkTerminalOnTile(Vector2 tile, out StardewValley.Object terminalObject)
         {
-            return (Game1.currentLocation.objects.TryGetValue(tile, out terminalObject) && terminalObject.Name == farmLinkTerminalName) || (Game1.currentLocation.objects.TryGetValue(tile + new Vector2(0f, 1f), out terminalObject) && terminalObject.Name == farmLinkTerminalName);
+            return (Game1.currentLocation.objects.TryGetValue(tile, out terminalObject) && terminalObject.Name == this.farmLinkTerminalName) || (Game1.currentLocation.objects.TryGetValue(tile + new Vector2(0f, 1f), out terminalObject) && terminalObject.Name == this.farmLinkTerminalName);
         }
 
         private void OpenFarmLinkTerminalMenu()
@@ -251,7 +239,7 @@ namespace UltimateStorageSystem
             {
                 return false;
             }
-            return chest.Items.Any((Item item) => item is StardewValley.Object obj && obj.QualifiedItemId == "(BC)holybananapants.UltimateStorageSystemContentPack_BlockTerminal");
+            return chest.Items.Any(item => item is StardewValley.Object obj && obj.QualifiedItemId == "(BC)holybananapants.UltimateStorageSystemContentPack_BlockTerminal");
         }
     }
 }

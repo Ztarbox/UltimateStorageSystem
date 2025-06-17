@@ -7,9 +7,16 @@ namespace UltimateStorageSystem.Tools
     {
         public static void UpdateShopData(IModHelper helper, IMonitor monitor, int terminalPrice, string vendor)
         {
-            string contentPackPath = Path.Combine(Path.GetDirectoryName(helper.DirectoryPath), "[CP]UltimateStorageSystem", "data", "Shop.json");
+            var modDirectoryName = Path.GetDirectoryName(helper.DirectoryPath);
+            if (modDirectoryName == null)
+            {
+                monitor.Log("Failed to get mod directory name.", LogLevel.Error);
+                return;
+            }
+
+            string contentPackPath = Path.Combine(modDirectoryName, "[CP]UltimateStorageSystem", "data", "Shop.json");
             string jsonText = File.ReadAllText(contentPackPath);
-            ShopData shopData = JsonSerializer.Deserialize<ShopData>(jsonText);
+            var shopData = JsonSerializer.Deserialize<ShopData>(jsonText);
             if (shopData != null && shopData.Changes != null && shopData.Changes.Count != 0)
             {
                 if (1 == 0)
