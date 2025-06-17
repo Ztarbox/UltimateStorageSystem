@@ -189,7 +189,7 @@ namespace UltimateStorageSystem.Drawing
                     int iconWidth = (int)(64f * iconScale);
                     Vector2 iconPosition = new(position.X - 16f, rowY - 16);
                     var itemObj = row.ItemIcon as StardewValley.Object;
-                    if (row.ItemIcon is Ring || row.ItemIcon is Boots || (itemObj != null && itemObj.preserve.Value.HasValue && this.IsPreservedItemToShift(itemObj.preserve.Value.Value)))
+                    if (row.ItemIcon is Ring || row.ItemIcon is Boots || (itemObj != null && itemObj.preserve.Value.HasValue && IsPreservedItemToShift(itemObj.preserve.Value.Value)))
                     {
                         iconPosition.Y += 10f;
                         iconPosition.X += 10f;
@@ -215,7 +215,7 @@ namespace UltimateStorageSystem.Drawing
             }
         }
 
-        private bool IsPreservedItemToShift(StardewValley.Object.PreserveType preserveType)
+        private static bool IsPreservedItemToShift(StardewValley.Object.PreserveType preserveType)
         {
             return preserveType == StardewValley.Object.PreserveType.Wine || preserveType == StardewValley.Object.PreserveType.Jelly || preserveType == StardewValley.Object.PreserveType.Pickle || preserveType == StardewValley.Object.PreserveType.Juice || preserveType == StardewValley.Object.PreserveType.Roe || preserveType == StardewValley.Object.PreserveType.AgedRoe || preserveType == StardewValley.Object.PreserveType.Honey || preserveType == StardewValley.Object.PreserveType.Bait || preserveType == StardewValley.Object.PreserveType.DriedFruit || preserveType == StardewValley.Object.PreserveType.DriedMushroom || preserveType == StardewValley.Object.PreserveType.SmokedFish;
         }
@@ -226,7 +226,7 @@ namespace UltimateStorageSystem.Drawing
             bool needsScrolling = textWidth > columnWidth - 10;
             if (isHovered && needsScrolling)
             {
-                this.DrawScrollingText(spriteBatch, cellText, position, textColor, columnWidth - 10);
+                DrawScrollingText(spriteBatch, cellText, position, textColor, columnWidth - 10);
                 return;
             }
             string displayText = cellText;
@@ -238,10 +238,10 @@ namespace UltimateStorageSystem.Drawing
                 }
                 displayText += "...";
             }
-            this.DrawText(spriteBatch, displayText, position, textColor, alignRight, columnWidth);
+            DrawText(spriteBatch, displayText, position, textColor, alignRight, columnWidth);
         }
 
-        private void DrawText(SpriteBatch spriteBatch, string text, Vector2 position, Color color, bool alignRight, int columnWidth)
+        private static void DrawText(SpriteBatch spriteBatch, string text, Vector2 position, Color color, bool alignRight, int columnWidth)
         {
             Vector2 textSize = Game1.smallFont.MeasureString(text);
             if (alignRight)
@@ -255,7 +255,7 @@ namespace UltimateStorageSystem.Drawing
             spriteBatch.DrawString(Game1.smallFont, text, position, color);
         }
 
-        private void DrawScrollingText(SpriteBatch spriteBatch, string fullText, Vector2 position, Color color, int maxVisibleWidth)
+        private static void DrawScrollingText(SpriteBatch spriteBatch, string fullText, Vector2 position, Color color, int maxVisibleWidth)
         {
             Rectangle oldScissorRect = spriteBatch.GraphicsDevice.ScissorRectangle;
             Rectangle scissor = new((int)position.X, (int)position.Y, maxVisibleWidth, 32);

@@ -15,25 +15,25 @@ namespace UltimateStorageSystem.Drawing
 {
     public class FarmLinkTerminalMenu : IClickableMenu
     {
-        private IModHelper helper;
+        private readonly IModHelper helper;
 
         private readonly string searchLabel;
 
         public StorageTab StorageTab;
 
-        private WorkbenchTab workbenchTab;
+        private readonly WorkbenchTab workbenchTab;
 
-        private CookingTab cookingTab;
+        private readonly CookingTab cookingTab;
 
-        private ShoppingTab shoppingTab;
+        private readonly ShoppingTab shoppingTab;
 
-        private CommandInputField commandInputField;
+        private readonly CommandInputField commandInputField;
 
-        private List<ClickableTextureComponent> tabs;
+        private readonly List<ClickableTextureComponent> tabs;
 
         private int selectedTab;
 
-        private InputHandler inputHandler;
+        private readonly InputHandler inputHandler;
 
         private const int ScreenEdgePadding = 100;
 
@@ -112,7 +112,7 @@ namespace UltimateStorageSystem.Drawing
                     if (gameLocation is FarmHouse house)
                     {
                         var fridgeChest = house.fridge?.Value;
-                        if (fridgeChest != null && !this.IsBlockedChest(fridgeChest))
+                        if (fridgeChest != null && !IsBlockedChest(fridgeChest))
                         {
                             storageObjects.Add(fridgeChest);
                         }
@@ -120,7 +120,7 @@ namespace UltimateStorageSystem.Drawing
                     if (gameLocation is IslandFarmHouse islandhouse)
                     {
                         var islandfridgeChest = islandhouse.fridge?.Value;
-                        if (islandfridgeChest != null && !this.IsBlockedChest(islandfridgeChest))
+                        if (islandfridgeChest != null && !IsBlockedChest(islandfridgeChest))
                         {
                             storageObjects.Add(islandfridgeChest);
                         }
@@ -128,7 +128,7 @@ namespace UltimateStorageSystem.Drawing
                     if (gameLocation is Cabin cabin)
                     {
                         var cabinFridge = cabin.fridge?.Value;
-                        if (cabinFridge != null && !this.IsBlockedChest(cabinFridge))
+                        if (cabinFridge != null && !IsBlockedChest(cabinFridge))
                         {
                             storageObjects.Add(cabinFridge);
                         }
@@ -151,14 +151,14 @@ namespace UltimateStorageSystem.Drawing
             }
         }
 
-        private bool IsBlockedChest(Chest chest)
+        private static bool IsBlockedChest(Chest chest)
         {
             return chest.Items.Any(item => item is StardewValley.Object obj && obj.QualifiedItemId == "(BC)holybananapants.UltimateStorageSystemContentPack_BlockTerminal");
         }
 
         private bool IsValidStorage(Chest chest)
         {
-            return chest.playerChest.Value && !this.IsBlockedChest(chest);
+            return chest.playerChest.Value && !IsBlockedChest(chest);
         }
 
         public override void draw(SpriteBatch b)

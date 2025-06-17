@@ -12,25 +12,25 @@ namespace UltimateStorageSystem.Drawing
 {
     public class StorageTab : IClickableMenu
     {
-        private InventoryMenu playerInventoryMenu;
+        private readonly InventoryMenu playerInventoryMenu;
 
         private readonly FarmLinkTerminalMenu terminalMenu;
 
-        private Scrollbar scrollbar;
+        private readonly Scrollbar scrollbar;
 
         public InputHandler? inputHandler;
 
-        private ItemTransferManager itemTransferManager;
+        private readonly ItemTransferManager itemTransferManager;
 
-        private List<Item> unsortedItems;
+        private readonly List<Item> unsortedItems;
 
-        private List<ItemEntry> aggregatedItems;
+        private readonly List<ItemEntry> aggregatedItems;
 
-        private int computerMenuHeight;
+        private readonly int computerMenuHeight;
 
-        private int inventoryMenuWidth;
+        private readonly int inventoryMenuWidth;
 
-        private int inventoryMenuHeight = 280;
+        private readonly int inventoryMenuHeight = 280;
 
         private List<string> columnHeaders = new();
 
@@ -75,7 +75,7 @@ namespace UltimateStorageSystem.Drawing
             this.playerInventoryMenu = new InventoryMenu(inventoryMenuX, inventoryMenuY, playerInventory: false);
         }
 
-        private bool IsBlockedChest(Chest chest)
+        private static bool IsBlockedChest(Chest chest)
         {
             return chest.Items.Any(item => item is StardewValley.Object obj && obj.QualifiedItemId == "(BC)holybananapants.UltimateStorageSystemContentPack_BlockTerminal");
         }
@@ -88,7 +88,7 @@ namespace UltimateStorageSystem.Drawing
             {
                 foreach (StardewValley.Object obj in location.Objects.Values)
                 {
-                    if (!(obj is Chest chest) || chest.Items.Count <= 0 || this.IsBlockedChest(chest))
+                    if (!(obj is Chest chest) || chest.Items.Count <= 0 || IsBlockedChest(chest))
                     {
                         continue;
                     }
@@ -115,7 +115,7 @@ namespace UltimateStorageSystem.Drawing
                     continue;
                 }
                 Chest fridgeChest = farmHouse.fridge.Value;
-                if (fridgeChest == null || this.IsBlockedChest(fridgeChest))
+                if (fridgeChest == null || IsBlockedChest(fridgeChest))
                 {
                     continue;
                 }

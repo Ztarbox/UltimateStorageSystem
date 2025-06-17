@@ -12,17 +12,17 @@ namespace UltimateStorageSystem.Drawing
 {
     public class CookingTab : IClickableMenu
     {
-        private InventoryMenu playerInventoryMenu;
+        private readonly InventoryMenu playerInventoryMenu;
 
-        private Scrollbar scrollbar;
+        private readonly Scrollbar scrollbar;
 
-        private int computerMenuHeight;
+        private readonly int computerMenuHeight;
 
-        private int inventoryMenuWidth;
+        private readonly int inventoryMenuWidth;
 
-        private int inventoryMenuHeight = 280;
+        private readonly int inventoryMenuHeight = 280;
 
-        private List<CraftingRecipe> cookingRecipes;
+        private readonly List<CraftingRecipe> cookingRecipes;
 
         public InputHandler? inputHandler;
 
@@ -80,8 +80,8 @@ namespace UltimateStorageSystem.Drawing
                 if (craftingRecipe.createItem() is StardewValley.Object { QualifiedItemId: "0" } dish)
                 {
                     string recipeName = craftingRecipe.DisplayName;
-                    string buffs = this.GetRecipeBuffs(craftingRecipe);
-                    string ingredients = this.GetRecipeIngredients(craftingRecipe);
+                    string buffs = GetRecipeBuffs(craftingRecipe);
+                    string ingredients = GetRecipeIngredients(craftingRecipe);
                     string maxQuantity = craftingRecipe.getCraftableCount(this.TerminalMenu.GetAllStorageObjects()).ToString();
                     rows.Add(new TableRowWithIcon(dish, new List<string> { recipeName, buffs, ingredients, maxQuantity }));
                 }
@@ -89,9 +89,9 @@ namespace UltimateStorageSystem.Drawing
             return rows;
         }
 
-        private string GetRecipeBuffs(CraftingRecipe craftingRecipe)
+        private static string GetRecipeBuffs(CraftingRecipe craftingRecipe)
         {
-            if (!(craftingRecipe.createItem() is StardewValley.Object cookedDish))
+            if (craftingRecipe.createItem() is not StardewValley.Object cookedDish)
             {
                 return "No Buffs";
             }
@@ -109,7 +109,7 @@ namespace UltimateStorageSystem.Drawing
             return (buffs.Count > 0) ? string.Join(", ", buffs) : "No Buffs";
         }
 
-        private string GetRecipeIngredients(CraftingRecipe craftingRecipe)
+        private static string GetRecipeIngredients(CraftingRecipe craftingRecipe)
         {
             IEnumerable<string> names = craftingRecipe.recipeList.Select(kv => $"{craftingRecipe.getNameFromIndex(kv.Key)} ({kv.Value})");
             return string.Join(", ", names);
@@ -326,8 +326,7 @@ namespace UltimateStorageSystem.Drawing
                 int idx = (row.ItemIcon as StardewValley.Object)?.ParentSheetIndex ?? (-1);
                 var recipe = this.cookingRecipes.FirstOrDefault(delegate (CraftingRecipe r)
                 {
-                    var obj = r.createItem() as StardewValley.Object;
-                    return obj != null && obj.ParentSheetIndex == idx;
+                    return r.createItem() is StardewValley.Object obj && obj.ParentSheetIndex == idx;
                 });
                 if (recipe != null)
                 {

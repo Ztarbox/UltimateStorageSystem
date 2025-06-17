@@ -7,17 +7,17 @@ namespace UltimateStorageSystem.Drawing
 {
     public class ShoppingTab : IClickableMenu
     {
-        private InventoryMenu playerInventoryMenu;
+        private readonly InventoryMenu playerInventoryMenu;
 
-        private int containerWidth = 830;
+        private readonly int containerWidth = 830;
 
-        private int containerHeight = 900;
+        private readonly int containerHeight = 900;
 
-        private int computerMenuHeight;
+        private readonly int computerMenuHeight;
 
-        private int inventoryMenuWidth;
+        private readonly int inventoryMenuWidth;
 
-        private int inventoryMenuHeight = 280;
+        private readonly int inventoryMenuHeight = 280;
 
         public ShoppingTab(int xPositionOnScreen, int yPositionOnScreen)
             : base(xPositionOnScreen, yPositionOnScreen, 800, 1000)

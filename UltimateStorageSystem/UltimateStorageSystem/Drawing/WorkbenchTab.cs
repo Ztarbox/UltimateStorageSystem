@@ -1,4 +1,3 @@
-#define DEBUG
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -14,23 +13,19 @@ namespace UltimateStorageSystem.Drawing
 {
     public class WorkbenchTab : IClickableMenu
     {
-        private InventoryMenu playerInventoryMenu;
+        private readonly InventoryMenu playerInventoryMenu;
 
-        private ItemTransferManager transferManager;
+        private readonly ItemTransferManager transferManager;
 
-        private Scrollbar scrollbar;
+        private readonly Scrollbar scrollbar;
 
-        private int containerWidth;
+        private readonly int computerMenuHeight;
 
-        private int containerHeight;
+        private readonly int inventoryMenuWidth;
 
-        private int computerMenuHeight;
+        private readonly int inventoryMenuHeight = 280;
 
-        private int inventoryMenuWidth;
-
-        private int inventoryMenuHeight = 280;
-
-        private List<CraftingRecipe> craftingRecipes;
+        private readonly List<CraftingRecipe> craftingRecipes;
 
         public InputHandler? inputHandler;
 
@@ -52,8 +47,6 @@ namespace UltimateStorageSystem.Drawing
             : base(xPositionOnScreen, yPositionOnScreen, containerWidth, containerHeight)
         {
             this.TerminalMenu = terminalMenu;
-            this.containerWidth = containerWidth;
-            this.containerHeight = containerHeight;
             this.computerMenuHeight = containerHeight - this.inventoryMenuHeight;
             int slotsPerRow = 12;
             int slotSize = 64;
@@ -91,7 +84,7 @@ namespace UltimateStorageSystem.Drawing
                 Item item = recipe.createItem();
                 string itemName = item.DisplayName;
                 string itemType = item.getCategoryName();
-                string ingredients = this.GetIngredientsString(recipe);
+                string ingredients = GetIngredientsString(recipe);
                 string maxQuantity = this.CalculateMaxCraftable(recipe).ToString();
                 Debug.WriteLine("Item: " + itemName + ", Ingredients: " + ingredients);
                 rows.Add(new TableRowWithIcon(item, new List<string> { itemName, itemType, ingredients, maxQuantity }));
@@ -104,7 +97,7 @@ namespace UltimateStorageSystem.Drawing
             this.CraftingTable?.ResetSort();
         }
 
-        private string GetIngredientsString(CraftingRecipe recipe)
+        private static string GetIngredientsString(CraftingRecipe recipe)
         {
             List<string> ingredientList = new();
             foreach (KeyValuePair<string, int> ingredient in recipe.recipeList)
@@ -144,7 +137,7 @@ namespace UltimateStorageSystem.Drawing
             }
             b.DrawString(Game1.dialogueFont, title, titlePosition, titleColor, 0f, Vector2.Zero, scale, SpriteEffects.None, 0.86f);
             this.CraftingTable.Draw(b);
-            IClickableMenu.drawTextureBox(b, this.xPositionOnScreen, this.yPositionOnScreen + upperFrameHeight - 60, fixedWidth, inventoryFrameHeight - 30, Color.White);
+            drawTextureBox(b, this.xPositionOnScreen, this.yPositionOnScreen + upperFrameHeight - 60, fixedWidth, inventoryFrameHeight - 30, Color.White);
             this.playerInventoryMenu.draw(b);
             if (this.craftMode && this.currentRecipe != null)
             {
