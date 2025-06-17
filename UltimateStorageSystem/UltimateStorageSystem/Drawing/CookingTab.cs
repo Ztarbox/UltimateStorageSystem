@@ -204,6 +204,7 @@ namespace UltimateStorageSystem.Drawing
                                 this.ConsumeIngredientsPrioritized(this.currentRecipe, 1);
                             }
                             this.UpdateCookingTable();
+                            this.currentRecipe.timesCrafted += this.cookAmount;
                             this.cookMode = false;
                         }
                         break;

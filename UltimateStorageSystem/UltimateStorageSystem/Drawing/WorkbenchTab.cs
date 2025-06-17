@@ -219,6 +219,7 @@ namespace UltimateStorageSystem.Drawing
                             this.currentRecipe.consumeIngredients(inventories);
                         }
                         this.UpdateCraftingTable();
+                        this.currentRecipe.timesCrafted += this.craftAmount;
                         this.craftMode = false;
                         break;
                     }
