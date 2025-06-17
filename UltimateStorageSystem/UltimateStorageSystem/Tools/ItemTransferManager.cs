@@ -60,7 +60,7 @@ namespace UltimateStorageSystem.Tools
                                 select new
                                 {
                                     Chest = chest2,
-                                    ItemCount = chest2.Items.Where((Item item2) => item2?.canStackWith(item) ?? false).Sum((Item item2) => item2.Stack)
+                                    ItemCount = chest2.Items.Where(item2 => item2?.canStackWith(item) ?? false).Sum(item2 => item2.Stack)
                                 } into anon
                                 where anon.ItemCount > 0
                                 orderby anon.ItemCount
@@ -108,7 +108,7 @@ namespace UltimateStorageSystem.Tools
                                 select new
                                 {
                                     Chest = chest2,
-                                    ItemCount = chest2.Items.Where((Item i) => i?.canStackWith(item) ?? false).Sum((Item i) => i.Stack)
+                                    ItemCount = chest2.Items.Where(i => (i?.canStackWith(item) ?? false) || i?.maximumStackSize() == 1 && (i?.QualifiedItemId == item.QualifiedItemId && (chest2.GetActualCapacity() - chest2.Items.Count) > 1)).Sum(i => i.Stack)
                                 } into anon
                                 where anon.ItemCount > 0
                                 orderby anon.ItemCount descending
@@ -201,7 +201,7 @@ namespace UltimateStorageSystem.Tools
                 int maxStackSize = item.maximumStackSize();
                 amountToTransfer = Math.Min(amountToTransfer, Math.Min(entry.Quantity, maxStackSize - 1));
             }
-            if (item is Furniture || item is Ring || item is MeleeWeapon || item is Tool || item is Boots)
+            if (item.maximumStackSize() == 1)
             {
                 if (!isInInventory)
                 {
