@@ -5,6 +5,7 @@ using StardewValley;
 using StardewValley.Inventories;
 using StardewValley.Menus;
 using StardewValley.Objects;
+using System.Runtime.CompilerServices;
 using UltimateStorageSystem.Tools;
 using UltimateStorageSystem.Utilities;
 
@@ -14,7 +15,7 @@ namespace UltimateStorageSystem.Drawing
     {
         private readonly InventoryMenu playerInventoryMenu;
 
-        private readonly Scrollbar scrollbar;
+        private readonly Scrollbar Scrollbar;
 
         private readonly int computerMenuHeight;
 
@@ -61,14 +62,14 @@ namespace UltimateStorageSystem.Drawing
             List<int> columnWidths = new() { 250, 230, 280, 100 };
             List<bool> columnAlignments = new() { false, false, false, true };
             List<TableRowWithIcon> tableRows = this.GenerateRecipeData();
-            this.CookingTable = new DynamicTable(xPositionOnScreen + 30, yPositionOnScreen + 40, columnHeaders, columnWidths, columnAlignments, tableRows, this.scrollbar);
-            this.scrollbar = new Scrollbar(xPositionOnScreen + containerWidth - 50, yPositionOnScreen + 103, this.CookingTable);
-            this.CookingTable.Scrollbar = this.scrollbar;
+            this.CookingTable = new DynamicTable(xPositionOnScreen + 30, yPositionOnScreen + 40, columnHeaders, columnWidths, columnAlignments, tableRows, this.Scrollbar);
+            this.Scrollbar = new Scrollbar(xPositionOnScreen + containerWidth - 50, yPositionOnScreen + 103, this.CookingTable);
+            this.CookingTable.Scrollbar = this.Scrollbar;
         }
 
         public void ResetSort()
         {
-            this.CookingTable?.ResetSort();
+            this.CookingTable.ResetSort();
         }
 
         private List<TableRowWithIcon> GenerateRecipeData()
@@ -137,7 +138,7 @@ namespace UltimateStorageSystem.Drawing
             }
             b.DrawString(Game1.dialogueFont, title, titlePosition, titleColor, 0f, Vector2.Zero, scale, SpriteEffects.None, 0.86f);
             this.CookingTable.Draw(b);
-            IClickableMenu.drawTextureBox(b, this.xPositionOnScreen, this.yPositionOnScreen + upperFrameHeight - 60, fixedWidth, inventoryFrameHeight - 30, Color.White);
+            drawTextureBox(b, this.xPositionOnScreen, this.yPositionOnScreen + upperFrameHeight - 60, fixedWidth, inventoryFrameHeight - 30, Color.White);
             this.playerInventoryMenu.draw(b);
             if (this.cookMode && this.currentRecipe != null)
             {
@@ -216,7 +217,7 @@ namespace UltimateStorageSystem.Drawing
                 return;
             }
             base.receiveLeftClick(x, y, playSound);
-            this.scrollbar.ReceiveLeftClick(x, y);
+            this.Scrollbar.ReceiveLeftClick(x, y);
             var clickedItem = this.CookingTable.GetClickedItem(x, y);
             if (clickedItem == null || this.TerminalMenu == null)
             {
@@ -298,12 +299,12 @@ namespace UltimateStorageSystem.Drawing
                 return;
             }
             this.CookingTable.ReceiveScrollWheelAction(direction);
-            this.scrollbar.UpdateScrollBarPosition();
+            this.Scrollbar.UpdateScrollBarPosition();
         }
 
         public void LeftClickHeld(int x, int y)
         {
-            this.scrollbar.LeftClickHeld(x, y);
+            this.Scrollbar.LeftClickHeld(x, y);
         }
 
         public override void receiveKeyPress(Keys key)
@@ -404,7 +405,7 @@ namespace UltimateStorageSystem.Drawing
         {
             base.update(time);
             this.CookingTable.Update();
-            this.scrollbar.UpdateScrollBarPosition();
+            this.Scrollbar.UpdateScrollBarPosition();
         }
     }
 }

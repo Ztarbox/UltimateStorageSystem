@@ -7,7 +7,6 @@ using StardewValley.Buildings;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Objects;
-using UltimateStorageSystem.Interfaces;
 using UltimateStorageSystem.Tools;
 using UltimateStorageSystem.Utilities;
 
@@ -15,8 +14,6 @@ namespace UltimateStorageSystem.Drawing
 {
     public class FarmLinkTerminalMenu : IClickableMenu
     {
-        private readonly IModHelper helper;
-
         private readonly string searchLabel;
 
         public StorageTab StorageTab;
@@ -35,12 +32,9 @@ namespace UltimateStorageSystem.Drawing
 
         private readonly InputHandler inputHandler;
 
-        private const int ScreenEdgePadding = 100;
-
-        public FarmLinkTerminalMenu(List<Chest> chests, IModHelper helper)
+        public FarmLinkTerminalMenu(List<Chest> chests)
             : base(0, 0, 1000, 900)
         {
-            this.helper = helper;
             this.searchLabel = ModHelper.Helper.Translation.Get("Search");
             this.width = 1000;
             this.height = 800;
@@ -53,7 +47,7 @@ namespace UltimateStorageSystem.Drawing
             this.yPositionOnScreen = (int)((Game1.uiViewport.Height - this.height) / 2f);
             DynamicTable itemTable = new(this.xPositionOnScreen, this.yPositionOnScreen, new List<string>(), new List<int>(), new List<bool>(), new List<TableRowWithIcon>(), null);
             Scrollbar scrollbar = new(this.xPositionOnScreen + 790, this.yPositionOnScreen + 120, itemTable);
-            InventoryMenu playerInventoryMenu = new(this.xPositionOnScreen + 15, this.yPositionOnScreen + 680, playerInventory: true);
+            InventoryMenu playerInventoryMenu = new(this.xPositionOnScreen + 15, this.yPositionOnScreen + 680, playerInventory: true, rows: 6);
             ItemTransferManager itemTransferManager = new(chests, itemTable);
             itemTransferManager.UpdateChestItemsAndSort();
             this.inputHandler = new InputHandler(playerInventoryMenu, scrollbar, this);
@@ -70,11 +64,11 @@ namespace UltimateStorageSystem.Drawing
             this.workbenchTab.ResetSort();
             this.cookingTab.ResetSort();
             this.tabs = new List<ClickableTextureComponent>
-        {
-            new("Storage", new Rectangle(this.xPositionOnScreen + 20, this.yPositionOnScreen - 64, 64, 64), null, null, Game1.mouseCursors, new Rectangle(16, 368, 16, 16), 4f),
-            new("Workbench", new Rectangle(this.xPositionOnScreen + 88, this.yPositionOnScreen - 64, 64, 64), null, null, Game1.mouseCursors, new Rectangle(16, 368, 16, 16), 4f),
-            new("Cooking", new Rectangle(this.xPositionOnScreen + 156, this.yPositionOnScreen - 64, 64, 64), null, null, Game1.mouseCursors, new Rectangle(16, 368, 16, 16), 4f)
-        };
+            {
+                new("Storage", new Rectangle(this.xPositionOnScreen + 20, this.yPositionOnScreen - 64, 64, 64), null, null, Game1.mouseCursors, new Rectangle(16, 368, 16, 16), 4f),
+                new("Workbench", new Rectangle(this.xPositionOnScreen + 88, this.yPositionOnScreen - 64, 64, 64), null, null, Game1.mouseCursors, new Rectangle(16, 368, 16, 16), 4f),
+                new("Cooking", new Rectangle(this.xPositionOnScreen + 156, this.yPositionOnScreen - 64, 64, 64), null, null, Game1.mouseCursors, new Rectangle(16, 368, 16, 16), 4f)
+            };
             this.selectedTab = 0;
         }
 
@@ -104,7 +98,7 @@ namespace UltimateStorageSystem.Drawing
                 {
                     foreach (StardewValley.Object obj in gameLocation.Objects.Values)
                     {
-                        if (obj is Chest chest && this.IsValidStorage(chest))
+                        if (obj is Chest chest && IsValidStorage(chest))
                         {
                             storageObjects.Add(chest);
                         }
@@ -156,7 +150,7 @@ namespace UltimateStorageSystem.Drawing
             return chest.Items.Any(item => item is StardewValley.Object obj && obj.QualifiedItemId == "(BC)holybananapants.UltimateStorageSystemContentPack_BlockTerminal");
         }
 
-        private bool IsValidStorage(Chest chest)
+        private static bool IsValidStorage(Chest chest)
         {
             return chest.playerChest.Value && !IsBlockedChest(chest);
         }

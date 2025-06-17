@@ -227,7 +227,7 @@ namespace UltimateStorageSystem
 
         private void OpenFarmLinkTerminalMenu()
         {
-            FarmLinkTerminalMenu farmLinkTerminalMenu = new(new List<Chest>(), this.Helper);
+            FarmLinkTerminalMenu farmLinkTerminalMenu = new(new List<Chest>());
             ItemTransferManager itemTransferManager = new(farmLinkTerminalMenu.GetAllStorageObjects(), new DynamicTable(0, 0, new List<string>(), new List<int>(), new List<bool>(), new List<TableRowWithIcon>(), null));
             itemTransferManager.UpdateChestItemsAndSort();
             Game1.activeClickableMenu = farmLinkTerminalMenu;

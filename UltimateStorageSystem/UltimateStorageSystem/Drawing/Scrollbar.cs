@@ -80,16 +80,6 @@ namespace UltimateStorageSystem.Drawing
             this.scrollBar.Height = this.scrollBarRunner.Height;
         }
 
-        private void UpdateScrollBar(int y)
-        {
-            float percent = (y - this.scrollBarRunner.Y) / (float)(this.scrollBarRunner.Height - this.scrollBar.Height);
-            int itemCount = this.table.GetItemEntriesCount();
-            int visibleRows = this.table.GetVisibleRows();
-            this.table.ScrollIndex = (int)(percent * Math.Max(0, itemCount - visibleRows));
-            this.table.ScrollIndex = Math.Clamp(this.table.ScrollIndex, 0, Math.Max(0, itemCount - visibleRows));
-            this.UpdateScrollBarPosition();
-        }
-
         public void UpdateScrollBarPosition()
         {
             int itemCount = this.table.GetItemEntriesCount();

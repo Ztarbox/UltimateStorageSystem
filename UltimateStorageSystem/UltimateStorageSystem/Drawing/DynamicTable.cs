@@ -160,11 +160,11 @@ namespace UltimateStorageSystem.Drawing
                 {
                     spriteBatch.Draw(Game1.staminaRect, new Rectangle(this.StartX, rowY, this.TotalTableWidth(), 32), Color.White * 0.15f);
                 }
-                this.DrawRowContent(spriteBatch, this.StartX, rowY, rowContent, isHovered);
+                this.DrawRowContent(spriteBatch, rowY, rowContent, isHovered);
             }
         }
 
-        private void DrawRowContent(SpriteBatch spriteBatch, int startX, int rowY, TableRowWithIcon row, bool isHovered)
+        private void DrawRowContent(SpriteBatch spriteBatch, int rowY, TableRowWithIcon row, bool isHovered)
         {
             for (int i = 0; i < row.Cells.Count; i++)
             {
