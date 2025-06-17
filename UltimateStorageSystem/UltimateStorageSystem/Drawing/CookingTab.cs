@@ -77,7 +77,7 @@ namespace UltimateStorageSystem.Drawing
             foreach (string recipeKey in Game1.player.cookingRecipes.Keys)
             {
                 CraftingRecipe craftingRecipe = new(recipeKey, isCookingRecipe: true);
-                if (craftingRecipe.createItem() is StardewValley.Object { QualifiedItemId: "0" } dish)
+                if (craftingRecipe.createItem() is StardewValley.Object dish && dish.QualifiedItemId.StartsWith("(O)"))
                 {
                     string recipeName = craftingRecipe.DisplayName;
                     string buffs = GetRecipeBuffs(craftingRecipe);
