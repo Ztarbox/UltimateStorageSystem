@@ -85,7 +85,7 @@ namespace UltimateStorageSystem.Drawing
                 string itemName = item.DisplayName;
                 string itemType = item.getCategoryName();
                 string ingredients = GetIngredientsString(recipe);
-                string maxQuantity = this.CalculateMaxCraftable(recipe).ToString();
+                string maxQuantity = CalculateMaxCraftable(recipe).ToString();
                 Debug.WriteLine("Item: " + itemName + ", Ingredients: " + ingredients);
                 rows.Add(new TableRowWithIcon(item, new List<string> { itemName, itemType, ingredients, maxQuantity }));
             }
@@ -109,7 +109,7 @@ namespace UltimateStorageSystem.Drawing
             return string.Join(", ", ingredientList);
         }
 
-        private int CalculateMaxCraftable(CraftingRecipe recipe)
+        private static int CalculateMaxCraftable(CraftingRecipe recipe)
         {
             var chests = FarmLinkTerminalMenu.GetAllStorageObjects();
             return recipe.getCraftableCount(chests);

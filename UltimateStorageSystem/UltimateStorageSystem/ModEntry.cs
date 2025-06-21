@@ -150,7 +150,7 @@ namespace UltimateStorageSystem
                 {
                     this.config.Vendor = value;
                 }
-                this.Helper.WriteConfig<ModConfig>(this.config);
+                this.Helper.WriteConfig(this.config);
                 this.openTerminalHotkey = this.config.OpenFarmLinkTerminalHotkey.GetValueOrDefault();
                 this.OverrideShopData();
             });
