@@ -83,15 +83,21 @@ namespace UltimateStorageSystem.Drawing
             };
         }
 
-        public List<Chest> GetAllStorageObjects()
+        private static List<Chest> _allStorageObjectsCache = new();
+        public static List<Chest> GetAllStorageObjects()
         {
-            List<Chest> storageObjects = new();
+            if (!ModEntry.LocationTracker.IsDirty)
+            {
+                return _allStorageObjectsCache;
+            }
+
+            _allStorageObjectsCache.Clear();
             HashSet<GameLocation> visitedLocations = new();
             foreach (GameLocation location in ModEntry.LocationTracker.GetVisitedLocations())
             {
                 AddStorageFromLocation(location);
             }
-            return storageObjects;
+            return _allStorageObjectsCache;
             void AddStorageFromLocation(GameLocation gameLocation)
             {
                 if (visitedLocations.Add(gameLocation))
@@ -100,7 +106,7 @@ namespace UltimateStorageSystem.Drawing
                     {
                         if (obj is Chest chest && IsValidStorage(chest))
                         {
-                            storageObjects.Add(chest);
+                            _allStorageObjectsCache.Add(chest);
                         }
                     }
                     if (gameLocation is FarmHouse house)
@@ -108,7 +114,7 @@ namespace UltimateStorageSystem.Drawing
                         var fridgeChest = house.fridge?.Value;
                         if (fridgeChest != null && !IsBlockedChest(fridgeChest))
                         {
-                            storageObjects.Add(fridgeChest);
+                            _allStorageObjectsCache.Add(fridgeChest);
                         }
                     }
                     if (gameLocation is IslandFarmHouse islandhouse)
@@ -116,7 +122,7 @@ namespace UltimateStorageSystem.Drawing
                         var islandfridgeChest = islandhouse.fridge?.Value;
                         if (islandfridgeChest != null && !IsBlockedChest(islandfridgeChest))
                         {
-                            storageObjects.Add(islandfridgeChest);
+                            _allStorageObjectsCache.Add(islandfridgeChest);
                         }
                     }
                     if (gameLocation is Cabin cabin)
@@ -124,7 +130,7 @@ namespace UltimateStorageSystem.Drawing
                         var cabinFridge = cabin.fridge?.Value;
                         if (cabinFridge != null && !IsBlockedChest(cabinFridge))
                         {
-                            storageObjects.Add(cabinFridge);
+                            _allStorageObjectsCache.Add(cabinFridge);
                         }
                     }
                     if (gameLocation != null)

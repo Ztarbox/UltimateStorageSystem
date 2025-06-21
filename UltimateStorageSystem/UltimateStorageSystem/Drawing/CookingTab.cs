@@ -83,7 +83,7 @@ namespace UltimateStorageSystem.Drawing
                     string recipeName = craftingRecipe.DisplayName;
                     string buffs = GetRecipeBuffs(craftingRecipe);
                     string ingredients = GetRecipeIngredients(craftingRecipe);
-                    string maxQuantity = craftingRecipe.getCraftableCount(this.TerminalMenu.GetAllStorageObjects()).ToString();
+                    string maxQuantity = craftingRecipe.getCraftableCount(FarmLinkTerminalMenu.GetAllStorageObjects()).ToString();
                     rows.Add(new TableRowWithIcon(dish, new List<string> { recipeName, buffs, ingredients, maxQuantity }));
                 }
             }
@@ -199,7 +199,7 @@ namespace UltimateStorageSystem.Drawing
                                     Game1.playSound("coin");
                                 }
                             }
-                            List<IInventory> inventories = this.TerminalMenu.GetAllStorageObjects().Select((Func<Chest, IInventory>)(ch => ch.Items)).ToList();
+                            List<IInventory> inventories = FarmLinkTerminalMenu.GetAllStorageObjects().Select((Func<Chest, IInventory>)(ch => ch.Items)).ToList();
                             for (int i = 0; i < this.cookAmount; i++)
                             {
                                 this.ConsumeIngredientsPrioritized(this.currentRecipe, 1);
@@ -228,14 +228,14 @@ namespace UltimateStorageSystem.Drawing
             {
                 return;
             }
-            int maxCanCook = recipe.getCraftableCount(this.TerminalMenu.GetAllStorageObjects());
+            int maxCanCook = recipe.getCraftableCount(FarmLinkTerminalMenu.GetAllStorageObjects());
             if (maxCanCook <= 0)
             {
                 Game1.addHUDMessage(new HUDMessage(ModHelper.Helper.Translation.Get("not_enough_ingredients"), 3));
                 return;
             }
             int toCook = ((!Game1.oldKBState.IsKeyDown(Keys.LeftShift) && !Game1.oldKBState.IsKeyDown(Keys.RightShift)) ? 1 : Math.Min(5, maxCanCook));
-            List<IInventory> inventories2 = this.TerminalMenu.GetAllStorageObjects().Select((Func<Chest, IInventory>)(ch => ch.Items)).ToList();
+            List<IInventory> inventories2 = FarmLinkTerminalMenu.GetAllStorageObjects().Select((Func<Chest, IInventory>)(ch => ch.Items)).ToList();
             for (int i2 = 0; i2 < toCook; i2++)
             {
                 this.ConsumeIngredientsPrioritized(recipe, 1);
@@ -266,7 +266,7 @@ namespace UltimateStorageSystem.Drawing
                     var recipe = this.cookingRecipes.FirstOrDefault(r => r.name == clickedItem.Name || r.DisplayName == clickedItem.DisplayName);
                     if (recipe != null)
                     {
-                        int max = recipe.getCraftableCount(this.TerminalMenu.GetAllStorageObjects());
+                        int max = recipe.getCraftableCount(FarmLinkTerminalMenu.GetAllStorageObjects());
                         if (max > 0)
                         {
                             this.cookMode = true;
@@ -334,7 +334,7 @@ namespace UltimateStorageSystem.Drawing
                 });
                 if (recipe != null)
                 {
-                    int maxQty = recipe.getCraftableCount(this.TerminalMenu.GetAllStorageObjects());
+                    int maxQty = recipe.getCraftableCount(FarmLinkTerminalMenu.GetAllStorageObjects());
                     row.Cells[3] = maxQty.ToString();
                 }
             }
@@ -363,7 +363,7 @@ namespace UltimateStorageSystem.Drawing
                         isPlayer = true
                     })
                     .Concat(
-                        this.TerminalMenu.GetAllStorageObjects()
+                        FarmLinkTerminalMenu.GetAllStorageObjects()
                             .SelectMany(chest => chest.Items
                                 .Select((item, idx) => new { item, idx, chest })
                                 .Where(x => x.item is StardewValley.Object obj && CraftingRecipe.ItemMatchesForCrafting(obj, rawId))

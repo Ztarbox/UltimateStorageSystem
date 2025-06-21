@@ -63,7 +63,7 @@ namespace UltimateStorageSystem.Drawing
             this.ItemTable = new DynamicTable(xPositionOnScreen + 30, yPositionOnScreen + 40, this.columnHeaders, columnWidths, columnAlignments, tableRows, null);
             this.scrollbar = new Scrollbar(xPositionOnScreen + containerWidth - 50, yPositionOnScreen + 103, this.ItemTable);
             this.ItemTable.Scrollbar = this.scrollbar;
-            List<Chest> chests = terminalMenu.GetAllStorageObjects();
+            List<Chest> chests = FarmLinkTerminalMenu.GetAllStorageObjects();
             this.itemTransferManager = new ItemTransferManager(chests, this.ItemTable);
             this.itemTransferManager.UpdateChestItemsAndSort();
             this.scrollbar.UpdateScrollBarPosition();
@@ -268,7 +268,7 @@ namespace UltimateStorageSystem.Drawing
 
         public void RefreshItems()
         {
-            List<Chest> chests = this.terminalMenu.GetAllStorageObjects();
+            List<Chest> chests = FarmLinkTerminalMenu.GetAllStorageObjects();
             Dictionary<string, ItemEntry> itemDict = new();
             foreach (Chest chest in chests)
             {

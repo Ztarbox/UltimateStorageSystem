@@ -73,7 +73,7 @@ namespace UltimateStorageSystem.Drawing
             this.CraftingTable = new DynamicTable(xPositionOnScreen + 30, yPositionOnScreen + 40, columnHeaders, columnWidths, columnAlignments, tableRows, this.scrollbar, showCraftingQuantity: true);
             this.scrollbar = new Scrollbar(xPositionOnScreen + containerWidth - 50, yPositionOnScreen + 103, this.CraftingTable);
             this.CraftingTable.Scrollbar = this.scrollbar;
-            this.transferManager = new ItemTransferManager(terminalMenu.GetAllStorageObjects(), this.CraftingTable);
+            this.transferManager = new ItemTransferManager(FarmLinkTerminalMenu.GetAllStorageObjects(), this.CraftingTable);
         }
 
         private List<TableRowWithIcon> GenerateCraftingData()
@@ -111,7 +111,7 @@ namespace UltimateStorageSystem.Drawing
 
         private int CalculateMaxCraftable(CraftingRecipe recipe)
         {
-            var chests = this.TerminalMenu?.GetAllStorageObjects();
+            var chests = FarmLinkTerminalMenu.GetAllStorageObjects();
             return recipe.getCraftableCount(chests);
         }
 
@@ -206,7 +206,7 @@ namespace UltimateStorageSystem.Drawing
                                 Game1.playSound("coin");
                             }
                         }
-                        List<IInventory> inventories = this.TerminalMenu.GetAllStorageObjects().Select((Func<Chest, IInventory>)(ch => ch.Items)).ToList();
+                        List<IInventory> inventories = FarmLinkTerminalMenu.GetAllStorageObjects().Select((Func<Chest, IInventory>)(ch => ch.Items)).ToList();
                         for (int i = 0; i < this.craftAmount; i++)
                         {
                             this.currentRecipe.consumeIngredients(inventories);
@@ -235,7 +235,7 @@ namespace UltimateStorageSystem.Drawing
             {
                 return;
             }
-            int maxCanCraft = recipe.getCraftableCount(this.TerminalMenu.GetAllStorageObjects());
+            int maxCanCraft = recipe.getCraftableCount(FarmLinkTerminalMenu.GetAllStorageObjects());
             if (maxCanCraft <= 0)
             {
                 Game1.addHUDMessage(new HUDMessage(ModHelper.Helper.Translation.Get("not_enough_ingredients"), 3));
@@ -243,7 +243,7 @@ namespace UltimateStorageSystem.Drawing
             }
             bool shift = Game1.oldKBState.IsKeyDown(Keys.LeftShift) || Game1.oldKBState.IsKeyDown(Keys.RightShift);
             this.craftAmount = ((!shift) ? 1 : Math.Min(5, maxCanCraft));
-            List<IInventory> chestInventories = this.TerminalMenu.GetAllStorageObjects().Select((Func<Chest, IInventory>)(chest => chest.Items)).ToList();
+            List<IInventory> chestInventories = FarmLinkTerminalMenu.GetAllStorageObjects().Select((Func<Chest, IInventory>)(chest => chest.Items)).ToList();
             for (int i2 = 0; i2 < this.craftAmount; i2++)
             {
                 recipe.consumeIngredients(chestInventories);
@@ -281,7 +281,7 @@ namespace UltimateStorageSystem.Drawing
                     }
                     if (this.currentRecipe != null)
                     {
-                        int max = this.currentRecipe.getCraftableCount(this.TerminalMenu.GetAllStorageObjects());
+                        int max = this.currentRecipe.getCraftableCount(FarmLinkTerminalMenu.GetAllStorageObjects());
                         if (max > 0)
                         {
                             this.craftMode = true;
