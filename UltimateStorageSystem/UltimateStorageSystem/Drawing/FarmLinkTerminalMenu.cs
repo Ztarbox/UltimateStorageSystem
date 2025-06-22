@@ -47,18 +47,27 @@ namespace UltimateStorageSystem.Drawing
             this.yPositionOnScreen = (int)((Game1.uiViewport.Height - this.height) / 2f);
             DynamicTable itemTable = new(this.xPositionOnScreen, this.yPositionOnScreen, new List<string>(), new List<int>(), new List<bool>(), new List<TableRowWithIcon>(), null);
             Scrollbar scrollbar = new(this.xPositionOnScreen + 790, this.yPositionOnScreen + 120, itemTable);
-            InventoryMenu playerInventoryMenu = new(this.xPositionOnScreen + 15, this.yPositionOnScreen + 680, playerInventory: true, rows: 6);
+
+            int slotsPerRow = 12;
+            int slotSize = 64;
+            int inventoryMenuHeight = 280;
+            var inventoryMenuWidth = slotsPerRow * slotSize;
+            int inventoryMenuX = this.xPositionOnScreen + (this.width - inventoryMenuWidth) / 2 - 90;
+            var computerMenuHeight = this.height - inventoryMenuHeight;
+            int inventoryMenuY = this.yPositionOnScreen + computerMenuHeight + 70;
+            var playerInventoryMenu = new InventoryMenu(inventoryMenuX, inventoryMenuY, playerInventory: false);
+            
             ItemTransferManager itemTransferManager = new(chests, itemTable);
             itemTransferManager.UpdateChestItemsAndSort();
             this.inputHandler = new InputHandler(playerInventoryMenu, scrollbar, this);
-            this.StorageTab = new StorageTab(this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, this);
+            this.StorageTab = new StorageTab(this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, this, playerInventoryMenu);
             this.StorageTab.inputHandler = this.inputHandler;
-            this.workbenchTab = new WorkbenchTab(this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, this);
+            this.workbenchTab = new WorkbenchTab(this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, this, playerInventoryMenu);
             this.workbenchTab.inputHandler = this.inputHandler;
             this.workbenchTab.TerminalMenu = this;
-            this.cookingTab = new CookingTab(this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, this);
+            this.cookingTab = new CookingTab(this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, this, playerInventoryMenu);
             this.cookingTab.inputHandler = this.inputHandler;
-            this.shoppingTab = new ShoppingTab(this.xPositionOnScreen, this.yPositionOnScreen);
+            this.shoppingTab = new ShoppingTab(this.xPositionOnScreen, this.yPositionOnScreen, playerInventoryMenu);
             this.commandInputField = new CommandInputField(this.xPositionOnScreen + 30, this.yPositionOnScreen + 20, this.GetActiveTable(), this.searchLabel);
             this.StorageTab.ResetSort();
             this.workbenchTab.ResetSort();
@@ -83,7 +92,7 @@ namespace UltimateStorageSystem.Drawing
             };
         }
 
-        private static List<Chest> _allStorageObjectsCache = new();
+        private static readonly List<Chest> _allStorageObjectsCache = new();
         public static List<Chest> GetAllStorageObjects()
         {
             if (!ModEntry.LocationTracker.IsDirty)
@@ -299,27 +308,30 @@ namespace UltimateStorageSystem.Drawing
         public override void receiveLeftClick(int x, int y, bool playSound = true)
         {
             bool inMenu = x >= this.xPositionOnScreen && x <= this.xPositionOnScreen + this.width && y >= this.yPositionOnScreen && y <= this.yPositionOnScreen + this.height;
-            bool onTab = this.tabs.Exists(tab => tab.containsPoint(x, y));
-            if (!inMenu && !onTab)
+            bool onTabBar = this.tabs.Exists(tab => tab.containsPoint(x, y));
+            if (!inMenu && !onTabBar)
             {
                 return;
             }
             base.receiveLeftClick(x, y, playSound);
-            for (int i = 0; i < this.tabs.Count; i++)
+            if (onTabBar)
             {
-                if (this.tabs[i].containsPoint(x, y))
+                for (int i = 0; i < this.tabs.Count; i++)
                 {
-                    this.selectedTab = i;
-                    this.commandInputField.UpdateTable(this.GetActiveTable());
-                    this.commandInputField.Reset();
-                    this.StorageTab.ResetSort();
-                    this.workbenchTab.ResetSort();
-                    this.cookingTab.ResetSort();
-                    if (this.selectedTab == 0)
+                    if (this.tabs[i].containsPoint(x, y))
                     {
-                        this.StorageTab.RefreshItems();
+                        this.selectedTab = i;
+                        this.commandInputField.UpdateTable(this.GetActiveTable());
+                        this.commandInputField.Reset();
+                        this.StorageTab.ResetSort();
+                        this.workbenchTab.ResetSort();
+                        this.cookingTab.ResetSort();
+                        if (this.selectedTab == 0)
+                        {
+                            this.StorageTab.RefreshItems();
+                        }
+                        return;
                     }
-                    return;
                 }
             }
             DynamicTable activeTable = this.GetActiveTable();
@@ -417,6 +429,7 @@ namespace UltimateStorageSystem.Drawing
 
         public override void receiveScrollWheelAction(int direction)
         {
+            base.receiveScrollWheelAction(direction);
             if (this.selectedTab == 0)
             {
                 this.StorageTab.receiveScrollWheelAction(direction);
@@ -453,6 +466,7 @@ namespace UltimateStorageSystem.Drawing
 
         public override void performHoverAction(int x, int y)
         {
+            base.performHoverAction(x, y);
             if (this.selectedTab == 0)
             {
                 this.StorageTab.performHoverAction(x, y);

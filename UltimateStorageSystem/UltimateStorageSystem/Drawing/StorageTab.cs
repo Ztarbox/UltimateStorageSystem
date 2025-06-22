@@ -26,21 +26,14 @@ namespace UltimateStorageSystem.Drawing
 
         private readonly List<ItemEntry> aggregatedItems;
 
-        private readonly int computerMenuHeight;
-
-        private readonly int inventoryMenuWidth;
-
-        private readonly int inventoryMenuHeight = 280;
-
         private List<string> columnHeaders = new();
 
         public DynamicTable ItemTable { get; set; }
 
-        public StorageTab(int xPositionOnScreen, int yPositionOnScreen, int containerWidth, int containerHeight, FarmLinkTerminalMenu terminalMenu)
+        public StorageTab(int xPositionOnScreen, int yPositionOnScreen, int containerWidth, int containerHeight, FarmLinkTerminalMenu terminalMenu, InventoryMenu inventoryMenu)
             : base(xPositionOnScreen, yPositionOnScreen, containerWidth, containerHeight)
         {
             this.terminalMenu = terminalMenu;
-            this.computerMenuHeight = containerHeight - this.inventoryMenuHeight;
             (List<Item>, List<ItemEntry>) storageData = this.CollectAllChestItems();
             this.unsortedItems = storageData.Item1;
             this.aggregatedItems = storageData.Item2;
@@ -67,12 +60,7 @@ namespace UltimateStorageSystem.Drawing
             this.itemTransferManager = new ItemTransferManager(chests, this.ItemTable);
             this.itemTransferManager.UpdateChestItemsAndSort();
             this.scrollbar.UpdateScrollBarPosition();
-            int slotsPerRow = 12;
-            int slotSize = 64;
-            this.inventoryMenuWidth = slotsPerRow * slotSize;
-            int inventoryMenuX = base.xPositionOnScreen + (containerWidth - this.inventoryMenuWidth) / 2 - 90;
-            int inventoryMenuY = base.yPositionOnScreen + this.computerMenuHeight + 70;
-            this.playerInventoryMenu = new InventoryMenu(inventoryMenuX, inventoryMenuY, playerInventory: false);
+            this.playerInventoryMenu = inventoryMenu;
         }
 
         private static bool IsBlockedChest(Chest chest)
@@ -198,17 +186,10 @@ namespace UltimateStorageSystem.Drawing
                 this.itemTransferManager.HandleLeftClick(clickedItem, isInInventory: false, shiftPressed);
                 return;
             }
-            foreach (ClickableComponent slot in this.playerInventoryMenu.inventory)
+            Item inventoryItem = this.playerInventoryMenu.getItemAt(x, y);
+            if (inventoryItem != null)
             {
-                if (slot.containsPoint(x, y) && this.playerInventoryMenu.actualInventory.Count > slot.myID)
-                {
-                    Item inventoryItem = this.playerInventoryMenu.actualInventory[slot.myID];
-                    if (inventoryItem != null)
-                    {
-                        this.itemTransferManager.HandleLeftClick(inventoryItem, isInInventory: true, shiftPressed);
-                    }
-                    break;
-                }
+                this.itemTransferManager.HandleLeftClick(inventoryItem, isInInventory: true, shiftPressed);
             }
         }
 

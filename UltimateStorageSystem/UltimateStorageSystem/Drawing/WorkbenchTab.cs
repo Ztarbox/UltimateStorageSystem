@@ -19,12 +19,6 @@ namespace UltimateStorageSystem.Drawing
 
         private readonly Scrollbar scrollbar;
 
-        private readonly int computerMenuHeight;
-
-        private readonly int inventoryMenuWidth;
-
-        private readonly int inventoryMenuHeight = 280;
-
         private readonly List<CraftingRecipe> craftingRecipes;
 
         public InputHandler? inputHandler;
@@ -43,17 +37,11 @@ namespace UltimateStorageSystem.Drawing
 
         public FarmLinkTerminalMenu TerminalMenu { get; set; }
 
-        public WorkbenchTab(int xPositionOnScreen, int yPositionOnScreen, int containerWidth, int containerHeight, FarmLinkTerminalMenu terminalMenu)
+        public WorkbenchTab(int xPositionOnScreen, int yPositionOnScreen, int containerWidth, int containerHeight, FarmLinkTerminalMenu terminalMenu, InventoryMenu inventoryMenu)
             : base(xPositionOnScreen, yPositionOnScreen, containerWidth, containerHeight)
         {
             this.TerminalMenu = terminalMenu;
-            this.computerMenuHeight = containerHeight - this.inventoryMenuHeight;
-            int slotsPerRow = 12;
-            int slotSize = 64;
-            this.inventoryMenuWidth = slotsPerRow * slotSize;
-            int inventoryMenuX = base.xPositionOnScreen + (containerWidth - this.inventoryMenuWidth) / 2 - 90;
-            int inventoryMenuY = base.yPositionOnScreen + this.computerMenuHeight + 70;
-            this.playerInventoryMenu = new InventoryMenu(inventoryMenuX, inventoryMenuY, playerInventory: false);
+            this.playerInventoryMenu = inventoryMenu;
             this.craftingRecipes = (from name in CraftingRecipe.craftingRecipes.Keys
                                where Game1.player.craftingRecipes.ContainsKey(name)
                                select new CraftingRecipe(name) into recipe

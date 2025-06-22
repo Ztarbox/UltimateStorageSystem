@@ -19,16 +19,14 @@ namespace UltimateStorageSystem.Drawing
 
         private readonly int inventoryMenuHeight = 280;
 
-        public ShoppingTab(int xPositionOnScreen, int yPositionOnScreen)
+        public ShoppingTab(int xPositionOnScreen, int yPositionOnScreen, InventoryMenu inventoryMenu)
             : base(xPositionOnScreen, yPositionOnScreen, 800, 1000)
         {
             this.computerMenuHeight = this.containerHeight - this.inventoryMenuHeight;
             int slotsPerRow = 12;
             int slotSize = 64;
             this.inventoryMenuWidth = slotsPerRow * slotSize;
-            int inventoryMenuX = base.xPositionOnScreen + (this.containerWidth - this.inventoryMenuWidth) / 2;
-            int inventoryMenuY = base.yPositionOnScreen + this.computerMenuHeight + 55;
-            this.playerInventoryMenu = new InventoryMenu(inventoryMenuX, inventoryMenuY, playerInventory: true);
+            this.playerInventoryMenu = inventoryMenu;
         }
 
         public override void draw(SpriteBatch b)

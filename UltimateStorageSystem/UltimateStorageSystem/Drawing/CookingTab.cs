@@ -17,12 +17,6 @@ namespace UltimateStorageSystem.Drawing
 
         private readonly Scrollbar Scrollbar;
 
-        private readonly int computerMenuHeight;
-
-        private readonly int inventoryMenuWidth;
-
-        private readonly int inventoryMenuHeight = 280;
-
         private readonly List<CraftingRecipe> cookingRecipes;
 
         public InputHandler? inputHandler;
@@ -39,17 +33,11 @@ namespace UltimateStorageSystem.Drawing
 
         public FarmLinkTerminalMenu TerminalMenu { get; set; }
 
-        public CookingTab(int xPositionOnScreen, int yPositionOnScreen, int containerWidth, int containerHeight, FarmLinkTerminalMenu terminalMenu)
+        public CookingTab(int xPositionOnScreen, int yPositionOnScreen, int containerWidth, int containerHeight, FarmLinkTerminalMenu terminalMenu, InventoryMenu inventoryMenu)
             : base(xPositionOnScreen, yPositionOnScreen, containerWidth, containerHeight)
         {
             this.TerminalMenu = terminalMenu;
-            this.computerMenuHeight = containerHeight - this.inventoryMenuHeight;
-            int slotsPerRow = 12;
-            int slotSize = 64;
-            this.inventoryMenuWidth = slotsPerRow * slotSize;
-            int inventoryMenuX = base.xPositionOnScreen + (containerWidth - this.inventoryMenuWidth) / 2 - 90;
-            int inventoryMenuY = base.yPositionOnScreen + this.computerMenuHeight + 70;
-            this.playerInventoryMenu = new InventoryMenu(inventoryMenuX, inventoryMenuY, playerInventory: false);
+            this.playerInventoryMenu = inventoryMenu;
             this.cookingRecipes = Game1.player.cookingRecipes.Keys.Select(name => new CraftingRecipe(name, isCookingRecipe: true)).ToList();
             List<string> columnHeaders = new()
             {
