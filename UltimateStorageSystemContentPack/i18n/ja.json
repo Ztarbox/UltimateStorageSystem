@@ -1,6 +1,9 @@
 ﻿{
-    "FarmLinkTerminal_name": "ファームリンク端末",
-    "FarmLinkTerminal_description": "1台のコンピュータからすべてのアイテムにアクセスして管理します。",
-    "FarmLinkTerminal_DisplayName": "ファームリンク端末",
-    "FarmLinkTerminal_Recipe": "ファームリンク端末"
+  "FarmLinkTerminal_name": "ファームリンク端末",
+  "FarmLinkTerminal_description": "1台のコンピュータからすべてのアイテムにアクセスして管理します。",
+  "FarmLinkTerminal_DisplayName": "ファームリンク端末",
+  "FarmLinkTerminal_Recipe": "ファームリンク端末",
+
+  "BlockTerminal_DisplayName": "ターミナルブロッカー",
+  "BlockTerminal_Description": "このアイテムを含む収納にFarmLink端末がアクセスするのを防ぎます。"
 }

@@ -1,6 +1,9 @@
 ﻿{
-    "FarmLinkTerminal_name": "Terminal FarmLink",
-    "FarmLinkTerminal_description": "Accede y gestiona todos tus objetos desde una sola computadora.",
-    "FarmLinkTerminal_DisplayName": "Terminal FarmLink",
-    "FarmLinkTerminal_Recipe": "Terminal FarmLink"
+  "FarmLinkTerminal_name": "Terminal FarmLink",
+  "FarmLinkTerminal_description": "Accede y gestiona todos tus objetos desde una sola computadora.",
+  "FarmLinkTerminal_DisplayName": "Terminal FarmLink",
+  "FarmLinkTerminal_Recipe": "Terminal FarmLink",
+
+  "BlockTerminal_DisplayName": "Bloqueador de Terminal",
+  "BlockTerminal_Description": "Evita que el Terminal FarmLink acceda a cualquier almacenamiento que contenga este objeto."
 }

@@ -1,4 +1,59 @@
 ﻿{
-    "no_storage_space_message": "Choose a storage spot for this item first!"
-}
+  "no_storage_space_message": "Choose a storage spot for this item first!",
+  "not_enough_ingredients": "Not enough ingredients!",
 
+  "Search": "Search: ",
+
+  "menu.shopSettings": "Shop Settings",
+  "menu.shopSettingsTooltip": "Configuration for vendor and price of the terminal.",
+  "menu.vendor": "Vendor",
+  "menu.vendorTooltip": "The vendor who offers the terminal.",
+  "menu.price": "Price of the Terminal",
+  "menu.priceTooltip": "The price for the FarmLink Terminal.",
+  "menu.noticeTitle": "*** NOTICE ***",
+  "menu.noticeContent": "Changes to vendor and price will only take effect after restarting the game.\n\nTo apply changes without restarting, enter the following console command:",
+  "menu.command": "'patch reload holybananapants.UltimateStorageSystemContentPack'",
+  "menu.hotkeys": "Hotkeys",
+  "menu.hotkeysTooltip": "Key configuration for accessing the terminal.",
+  "menu.hotkeyOpen": "Hotkey to open terminal",
+  "menu.hotkeyOpenTooltip": "The key to open the FarmLink Terminal.",
+
+  "column.item": "Item",
+  "column.craft_item": "Crafting",
+  "column.qty": "Qty",
+  "column.value": "Value",
+  "column.total": "Total",
+  "column.recipe": "Recipe",
+  "column.buffs": "Buffs",
+  "column.ingredients": "Ingredients",
+  "column.material": "Material",
+  "column.max": "Max",
+  "column.type": "Type",
+
+  "help.storage.leftclick.title": "Left-click:",
+  "help.storage.shiftleftclick.title": "Shift + Left-click:",
+  "help.storage.rightclick.title": "Right-click:",
+  "help.storage.shiftrightclick.title": "Shift + Right-click:",
+  "help.storage.leftclick.desc": "Transfer full stack",
+  "help.storage.shiftleftclick.desc": "Transfer half stack",
+  "help.storage.rightclick.desc": "Transfer 1 item",
+  "help.storage.shiftrightclick.desc": "Transfer 10 items",
+
+  "help.crafting.leftclick.title": "Left-click:",
+  "help.crafting.shiftleftclick.title": "Shift + Left-click:",
+  "help.crafting.rightclick.title": "Right-click:",
+  "help.crafting.quick.desc.split1": "Craft 1 item",
+  "help.crafting.quick.desc.split2": "Craft 5 items",
+  "help.crafting.multi.desc": "Multicraft: Set amount with scroll wheel and left-click on free slot",
+
+  "help.cooking.leftclick.title": "Left-click:",
+  "help.cooking.shiftleftclick.title": "Shift + Left-click:",
+  "help.cooking.rightclick.title": "Right-click:",
+
+  "help.cooking.quick.desc.split1": "Cook 1 dish",
+  "help.cooking.quick.desc.split2": "Cook 5 dishes",
+  "help.cooking.multi.desc": "Multicook: Set amount with scroll wheel and left-click on free slot",
+
+  "help.shopping.leftclick.title": "Left-click:",
+  "help.shopping.leftclick.desc": "Display only – no actions available"
+}

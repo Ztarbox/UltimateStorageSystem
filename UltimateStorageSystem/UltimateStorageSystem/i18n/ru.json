@@ -1,3 +1,58 @@
 ﻿{
-    "no_storage_space_message": "Сначала выберите место для хранения этого предмета!"
+  "no_storage_space_message": "Сначала выберите место для хранения этого предмета",
+  "not_enough_ingredients": "Недостаточно ингредиентов",
+
+  "Search": "Поиск: ",
+
+  "menu.shopSettings": "Настройки магазина",
+  "menu.shopSettingsTooltip": "Настройка продавца и цены терминала.",
+  "menu.vendor": "Продавец",
+  "menu.vendorTooltip": "Продавец, предлагающий терминал.",
+  "menu.price": "Цена терминала",
+  "menu.priceTooltip": "Цена FarmLink Terminal.",
+  "menu.noticeTitle": "*** ВНИМАНИЕ ***",
+  "menu.noticeContent": "Изменения продавца и цены вступят в силу только после перезапуска игры.\n\nЧтобы применить изменения без перезапуска, введите следующую команду консоли:",
+  "menu.command": "'patch reload holybananapants.UltimateStorageSystemContentPack'",
+  "menu.hotkeys": "Горячие клавиши",
+  "menu.hotkeysTooltip": "Настройка клавиш для доступа к терминалу.",
+  "menu.hotkeyOpen": "Горячая клавиша для открытия терминала",
+  "menu.hotkeyOpenTooltip": "Клавиша для открытия FarmLink Terminal.",
+
+  "column.item": "Предм.",
+  "column.craft_item": "Крафт",
+  "column.qty": "Кол-во",
+  "column.value": "Цена",
+  "column.total": "Итого",
+  "column.recipe": "Рецепт",
+  "column.buffs": "Эффекты",
+  "column.ingredients": "Ингр.",
+  "column.material": "Материал",
+  "column.max": "Макс",
+  "column.type": "Тип",
+
+  "help.storage.leftclick.title": "Левый клик:",
+  "help.storage.shiftleftclick.title": "Клавиша «Сдвиг» + левый клик:",
+  "help.storage.rightclick.title": "Правый клик:",
+  "help.storage.shiftrightclick.title": "Клавиша «Сдвиг» + правый клик:",
+  "help.storage.leftclick.desc": "Перенести весь стек",
+  "help.storage.shiftleftclick.desc": "Перенести половину стека",
+  "help.storage.rightclick.desc": "Перенести 1 предмет",
+  "help.storage.shiftrightclick.desc": "Перенести 10 предметов",
+
+  "help.crafting.leftclick.title": "Левый клик:",
+  "help.crafting.shiftleftclick.title": "Клавиша «Сдвиг» + левый клик:",
+  "help.crafting.rightclick.title": "Правый клик:",
+  "help.crafting.quick.desc.split1": "Создать 1 предмет",
+  "help.crafting.quick.desc.split2": "Создать 5 предметов",
+  "help.crafting.multi.desc": "Multicraft: установите количество колесиком мыши и кликните левой кнопкой по свободному слоту",
+
+  "help.cooking.leftclick.title": "Левый клик:",
+  "help.cooking.shiftleftclick.title": "Клавиша «Сдвиг» + левый клик:",
+  "help.cooking.rightclick.title": "Правый клик:",
+  "help.cooking.quick.desc.split1": "Приготовить 1 блюдо",
+  "help.cooking.quick.desc.split2": "Приготовить 5 блюд",
+  "help.cooking.multi.desc": "Multicook: установите количество колесиком мыши и кликните левой кнопкой по свободному слоту",
+
+  "help.shopping.leftclick.title": "Левый клик:",
+  "help.shopping.leftclick.desc": "Только просмотр – нет доступных действий"
 }

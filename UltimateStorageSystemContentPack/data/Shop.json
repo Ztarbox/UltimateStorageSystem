@@ -1,21 +1,21 @@
 {
-    "Changes": [
-        {
-            "LogName": "Add FarmLink Terminal recipe to dwarf's shop",
-            "Action": "EditData",
-            "Target": "Data/Shops",
-            "TargetField": [
-                "Dwarf",
-                "Items"
-            ],
-            "Entries": {
-                "{{ModID}}_FarmLinkTerminal": {                    
-                    "ItemId": "{{ModID}}_FarmLinkTerminal",
-                    "Description": "{{i18n:FarmLinkTerminal_Description}}",
-                    "IsRecipe": false,
-                    "Price": 100000
-                }
-            }
+  "Changes": [
+    {
+      "LogName": "Add FarmLink Terminal recipe to dwarf\u0027s shop",
+      "Action": "EditData",
+      "Target": "data/Shops",
+      "TargetField": [
+        "Dwarf",
+        "Items"
+      ],
+      "Entries": {
+        "{{ModID}}_FarmLinkTerminal": {
+          "ItemId": "{{ModID}}_FarmLinkTerminal",
+          "Description": "{{i18n:FarmLinkTerminal_Description}}",
+          "IsRecipe": false,
+          "Price": 100000
         }
-    ]
+      }
+    }
+  ]
 }

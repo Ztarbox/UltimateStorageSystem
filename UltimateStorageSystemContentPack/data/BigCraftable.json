@@ -1,30 +1,30 @@
 {
-    "Changes": [
-        {
-            "LogName": "Load FarmLink Terminal images",
-            "Action": "Load",
-            "Target": "Mods/{{ModID}}/FarmLinkTerminal",
-            "FromFile": "assets/FarmLinkTerminal.png"
-        },
-        {
-            "Action": "EditData",
-            "Target": "Data/BigCraftables",
-            "Entries": {
-                "{{ModID}}_FarmLinkTerminal": {
-                    "Name": "{{ModID}}_FarmLinkTerminal",
-                    "DisplayName": "{{i18n:FarmLinkTerminal_DisplayName}}",
-                    "Description": "{{i18n:FarmLinkTerminal_Description}}",
-                    "Price": -1,
-                    "Fragility": 0,
-                    "CanBePlacedOutdoors": true,
-                    "CanBePlacedIndoors": true,
-                    "IsLamp": true,
-                    "Texture": "Mods/{{ModID}}/FarmLinkTerminal",
-                    "SpriteIndex": 0,
-                    "ContextTags": null,
-                    "CustomFields": null
-                }
-            }
-        }    
-    ]
+  "Changes": [
+    {
+      "LogName": "Load FarmLink Terminal images",
+      "Action": "Load",
+      "Target": "Mods/{{ModID}}/FarmLinkTerminal",
+      "FromFile": "assets/FarmLinkTerminal.png"
+    },
+    {
+      "Action": "EditData",
+      "Target": "data/BigCraftables",
+      "Entries": {
+        "{{ModID}}_FarmLinkTerminal": {
+          "Name": "{{ModID}}_FarmLinkTerminal",
+          "DisplayName": "{{i18n:FarmLinkTerminal_DisplayName}}",
+          "Description": "{{i18n:FarmLinkTerminal_Description}}",
+          "Price": -1,
+          "Fragility": 0,
+          "CanBePlacedOutdoors": true,
+          "CanBePlacedIndoors": true,
+          "IsLamp": true,
+          "Texture": "Mods/{{ModID}}/FarmLinkTerminal",
+          "SpriteIndex": 0,
+          "ContextTags": null,
+          "CustomFields": null
+        }
+      }
+    }
+  ]
 }

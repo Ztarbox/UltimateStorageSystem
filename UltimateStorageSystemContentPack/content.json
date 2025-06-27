@@ -1,13 +1,17 @@
 {
-    "Format": "2.0",
-    "Changes": [
-        {
-            "Action": "Include",
-            "FromFile": "data/BigCraftable.json"
-        },
-        {
-        "Action": "Include",
-        "FromFile": "data/Shop.json"
-        }
-    ]
+  "Format": "2.0",
+  "Changes": [
+    {
+      "Action": "Include",
+      "FromFile": "data/BigCraftable.json"
+    },
+    {
+      "Action": "Include",
+      "FromFile": "data/Shop.json"
+    },
+    {
+      "Action": "Include",
+      "FromFile": "data/Blocker.json"
+    }
+  ]
 }

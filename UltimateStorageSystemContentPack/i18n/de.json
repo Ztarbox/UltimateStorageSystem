@@ -1,6 +1,9 @@
 ﻿{
-    "FarmLinkTerminal_name": "FarmLink Terminal",
-    "FarmLinkTerminal_description": "Zugriff und Verwaltung aller Gegenstände von einem einzigen Computer.",
-    "FarmLinkTerminal_DisplayName": "FarmLink Terminal",
-    "FarmLinkTerminal_Recipe": "FarmLink Terminal"
+  "FarmLinkTerminal_name": "FarmLink Terminal",
+  "FarmLinkTerminal_description": "Zugriff und Verwaltung aller Gegenstände von einem einzigen Computer.",
+  "FarmLinkTerminal_DisplayName": "FarmLink Terminal",
+  "FarmLinkTerminal_Recipe": "FarmLink Terminal",
+
+  "BlockTerminal_DisplayName": "Terminal-Blocker",
+  "BlockTerminal_Description": "Verhindert, dass das FarmLink-Terminal auf Truhen zugreift, in denen sich dieses Item befindet."
 }

@@ -1,288 +1,382 @@
-﻿using StardewValley;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using StardewValley.Menus;
 using Microsoft.Xna.Framework.Input;
+using StardewModdingAPI;
+using StardewValley;
+using StardewValley.Buildings;
+using StardewValley.Locations;
+using StardewValley.Menus;
+using StardewValley.Objects;
 using UltimateStorageSystem.Tools;
 using UltimateStorageSystem.Utilities;
-using System.Collections.Generic;
-using StardewValley.Objects;
-
-#nullable disable
 
 namespace UltimateStorageSystem.Drawing
 {
     public class FarmLinkTerminalMenu : IClickableMenu
     {
-        // Definition of GUI components and parameters
-        private InventoryMenu playerInventoryMenu; // Player inventory menu
-        private int containerWidth = 830; // Width of the main container
-        private int containerHeight = 900; // Height of the main container
-        private int computerMenuHeight; // Height of the computer menu
-        private int inventoryMenuWidth; // Width of the inventory menu
-        private int inventoryMenuHeight = 280; // Fixed height for the bottom frame (inventory area)
+        private readonly string searchLabel;
 
-        private ItemTable itemTable; // Table for displaying items
-        private Scrollbar scrollbar; // Scrollbar for the table
-        private SearchBox searchBox; // Search box for filtering items
-        private InputHandler inputHandler; // Handles input within the menu
-        private ItemTransferManager itemTransferManager; // Manager for transferring items
+        public StorageTab StorageTab;
 
-        private List<ClickableTextureComponent> tabs; // Liste der Reiter
-        private int selectedTab; // Der aktuell ausgewählte Reiter
+        private readonly WorkbenchTab workbenchTab;
 
-        // Constructor for the menu, initializes the GUI components.
-        public FarmLinkTerminalMenu(List<Chest> chests) : base(Game1.viewport.Width / 2 - 400, Game1.viewport.Height / 2 - 500, 800, 1000)
+        private readonly CookingTab cookingTab;
+
+        private readonly ShoppingTab shoppingTab;
+
+        private readonly CommandInputField commandInputField;
+
+        private readonly List<ClickableTextureComponent> tabs;
+
+        private int selectedTab;
+
+        private readonly InputHandler inputHandler;
+
+        public FarmLinkTerminalMenu(List<Chest> chests)
+            : base(0, 0, 1000, 900)
         {
-            // Calculate the position of the container relative to the screen.
-            this.xPositionOnScreen = (Game1.viewport.Width - this.containerWidth) / 2;
-            this.yPositionOnScreen = (Game1.viewport.Height - this.containerHeight) / 2;
+            this.searchLabel = ModHelper.Helper.Translation.Get("Search");
+            this.width = 1000;
+            this.height = 800;
+            float scaleFactor = Game1.options.uiScale;
+            int screenWidth = Game1.viewport.Width;
+            int screenHeight = Game1.viewport.Height;
+            int containerWidthScaled = (int)(this.width * scaleFactor);
+            int containerHeightScaled = (int)(this.height * scaleFactor);
+            this.xPositionOnScreen = (int)((Game1.uiViewport.Width - this.width) / 2f);
+            this.yPositionOnScreen = (int)((Game1.uiViewport.Height - this.height) / 2f);
+            DynamicTable itemTable = new(this.xPositionOnScreen, this.yPositionOnScreen, new List<string>(), new List<int>(), new List<bool>(), new List<TableRowWithIcon>(), null);
+            Scrollbar scrollbar = new(this.xPositionOnScreen + 790, this.yPositionOnScreen + 120, itemTable);
 
-            // Calculate the height of the computer menu.
-            computerMenuHeight = containerHeight - inventoryMenuHeight;
-
-            // Calculate the width of the inventory menu based on the number of slots per row.
-            int slotsPerRow = 12; // Assumption: 12 slots per row
-            int slotSize = 64; // Size of an inventory slot
-            inventoryMenuWidth = slotsPerRow * slotSize;
-
-            // Position of the inventory menu.
-            int inventoryMenuX = this.xPositionOnScreen + (containerWidth - inventoryMenuWidth) / 2;
-            int inventoryMenuY = this.yPositionOnScreen + computerMenuHeight + 55;
-            playerInventoryMenu = new InventoryMenu(inventoryMenuX, inventoryMenuY, true);
-
-            // Initialize the item table and scrollbar.
-            itemTable = new ItemTable(this.xPositionOnScreen, this.yPositionOnScreen);
-            scrollbar = new Scrollbar(this.xPositionOnScreen + containerWidth - 40, this.yPositionOnScreen + 120, itemTable);
-
-            // Initialize the search textbox.
-            searchBox = new SearchBox(xPositionOnScreen + 30, yPositionOnScreen + 20, itemTable, scrollbar);
-
-            // Initialize the ItemTransferManager to manage chest items.
-            itemTransferManager = new ItemTransferManager(chests, itemTable);
-            itemTransferManager.UpdateChestItemsAndSort(); // Updates and sorts the items.
-
-            // Initialize the input handler for the menu.
-            inputHandler = new InputHandler(playerInventoryMenu, scrollbar, searchBox, this);
-
-            // Sort the items by name and set the sort icon accordingly.
-            itemTable.SortItemsBy("Name", true);
-            ItemTableRenderer.SetSortState("Name", true);
-
-            // Reiter initialisieren
-            tabs = new List<ClickableTextureComponent>
+            int slotsPerRow = 12;
+            int slotSize = 64;
+            int inventoryMenuHeight = 280;
+            var inventoryMenuWidth = slotsPerRow * slotSize;
+            int inventoryMenuX = this.xPositionOnScreen + (this.width - inventoryMenuWidth) / 2 - 90;
+            var computerMenuHeight = this.height - inventoryMenuHeight;
+            int inventoryMenuY = this.yPositionOnScreen + computerMenuHeight + 70;
+            var playerInventoryMenu = new InventoryMenu(inventoryMenuX, inventoryMenuY, playerInventory: false);
+            
+            ItemTransferManager itemTransferManager = new(chests, itemTable);
+            itemTransferManager.UpdateChestItemsAndSort();
+            this.inputHandler = new InputHandler(playerInventoryMenu, scrollbar, this);
+            this.StorageTab = new StorageTab(this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, this, playerInventoryMenu);
+            this.StorageTab.inputHandler = this.inputHandler;
+            this.workbenchTab = new WorkbenchTab(this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, this, playerInventoryMenu);
+            this.workbenchTab.inputHandler = this.inputHandler;
+            this.workbenchTab.TerminalMenu = this;
+            this.cookingTab = new CookingTab(this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, this, playerInventoryMenu);
+            this.cookingTab.inputHandler = this.inputHandler;
+            this.shoppingTab = new ShoppingTab(this.xPositionOnScreen, this.yPositionOnScreen, playerInventoryMenu);
+            this.commandInputField = new CommandInputField(this.xPositionOnScreen + 30, this.yPositionOnScreen + 20, this.GetActiveTable(), this.searchLabel);
+            this.StorageTab.ResetSort();
+            this.workbenchTab.ResetSort();
+            this.cookingTab.ResetSort();
+            this.tabs = new List<ClickableTextureComponent>
             {
-                new ClickableTextureComponent("Terminal", new Rectangle(xPositionOnScreen + 20, yPositionOnScreen - 64, 64, 64), null, null, Game1.mouseCursors, new Rectangle(16, 368, 16, 16), 4f),
-                //new ClickableTextureComponent("Tab2", new Rectangle(xPositionOnScreen + 88, yPositionOnScreen - 64, 64, 64), null, null, Game1.mouseCursors, new Rectangle(16, 368, 16, 16), 4f),
-                //new ClickableTextureComponent("Tab3", new Rectangle(xPositionOnScreen + 156, yPositionOnScreen - 64, 64, 64), null, null, Game1.mouseCursors, new Rectangle(16, 368, 16, 16), 4f),
-                //new ClickableTextureComponent("Tab4", new Rectangle(xPositionOnScreen + 224, yPositionOnScreen - 64, 64, 64), null, null, Game1.mouseCursors, new Rectangle(16, 368, 16, 16), 4f),
+                new("Storage", new Rectangle(this.xPositionOnScreen + 20, this.yPositionOnScreen - 64, 64, 64), null, null, Game1.mouseCursors, new Rectangle(16, 368, 16, 16), 4f),
+                new("Workbench", new Rectangle(this.xPositionOnScreen + 88, this.yPositionOnScreen - 64, 64, 64), null, null, Game1.mouseCursors, new Rectangle(16, 368, 16, 16), 4f),
+                new("Cooking", new Rectangle(this.xPositionOnScreen + 156, this.yPositionOnScreen - 64, 64, 64), null, null, Game1.mouseCursors, new Rectangle(16, 368, 16, 16), 4f)
             };
-
-            selectedTab = 0; // Standardmäßig den ersten Reiter auswählen
+            this.selectedTab = 0;
         }
 
-        // Draws the menu and all components.
+        private DynamicTable GetActiveTable()
+        {
+            return this.selectedTab switch
+            {
+                0 => this.StorageTab.ItemTable,
+                1 => this.workbenchTab.CraftingTable,
+                2 => this.cookingTab.CookingTable,
+                _ => this.StorageTab.ItemTable,
+            };
+        }
+
+        private static readonly List<Chest> _allStorageObjectsCache = new();
+        public static List<Chest> GetAllStorageObjects()
+        {
+            if (!ModEntry.LocationTracker.IsDirty)
+            {
+                return _allStorageObjectsCache;
+            }
+
+            _allStorageObjectsCache.Clear();
+            HashSet<GameLocation> visitedLocations = new();
+            foreach (GameLocation location in ModEntry.LocationTracker.GetVisitedLocations())
+            {
+                AddStorageFromLocation(location);
+            }
+            return _allStorageObjectsCache;
+            void AddStorageFromLocation(GameLocation gameLocation)
+            {
+                if (visitedLocations.Add(gameLocation))
+                {
+                    foreach (StardewValley.Object obj in gameLocation.Objects.Values)
+                    {
+                        if (obj is Chest chest && IsValidStorage(chest))
+                        {
+                            _allStorageObjectsCache.Add(chest);
+                        }
+                    }
+                    if (gameLocation is FarmHouse house)
+                    {
+                        var fridgeChest = house.fridge?.Value;
+                        if (fridgeChest != null && !IsBlockedChest(fridgeChest))
+                        {
+                            _allStorageObjectsCache.Add(fridgeChest);
+                        }
+                    }
+                    if (gameLocation is IslandFarmHouse islandhouse)
+                    {
+                        var islandfridgeChest = islandhouse.fridge?.Value;
+                        if (islandfridgeChest != null && !IsBlockedChest(islandfridgeChest))
+                        {
+                            _allStorageObjectsCache.Add(islandfridgeChest);
+                        }
+                    }
+                    if (gameLocation is Cabin cabin)
+                    {
+                        var cabinFridge = cabin.fridge?.Value;
+                        if (cabinFridge != null && !IsBlockedChest(cabinFridge))
+                        {
+                            _allStorageObjectsCache.Add(cabinFridge);
+                        }
+                    }
+                    if (gameLocation != null)
+                    {
+                        if (true)
+                        {
+                            foreach (Building building in gameLocation.buildings)
+                            {
+                                var indoors = building.indoors?.Value;
+                                if (indoors != null)
+                                {
+                                    AddStorageFromLocation(indoors);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private static bool IsBlockedChest(Chest chest)
+        {
+            return chest.Items.Any(item => item is StardewValley.Object obj && obj.QualifiedItemId == "(BC)holybananapants.UltimateStorageSystemContentPack_BlockTerminal");
+        }
+
+        private static bool IsValidStorage(Chest chest)
+        {
+            return chest.playerChest.Value && !IsBlockedChest(chest);
+        }
+
         public override void draw(SpriteBatch b)
         {
             base.draw(b);
-
-            // Zeichne den Inhalt des ausgewählten Tabs
-            if (selectedTab == 0)
+            this.commandInputField.Draw(b);
+            b.Draw(Game1.fadeToBlackRect, new Rectangle(0, 0, (int)(Game1.viewport.Width / Game1.options.uiScale), (int)(Game1.viewport.Height / Game1.options.uiScale)), Color.Black * 0.8f);
+            int fixedWidth = 1000;
+            IClickableMenu.drawTextureBox(b, this.xPositionOnScreen, this.yPositionOnScreen, fixedWidth, this.height, Color.White);
+            b.Draw(Game1.staminaRect, new Rectangle(this.xPositionOnScreen + 12, this.yPositionOnScreen + 12, fixedWidth - 24, this.height - 24), Color.Black);
+            if (this.selectedTab == 0)
             {
-                // Inhalt für den ersten Tab zeichnen
-                IClickableMenu.drawTextureBox(b, this.xPositionOnScreen, this.yPositionOnScreen, containerWidth, computerMenuHeight, Color.White);
-                b.Draw(Game1.staminaRect, new Rectangle(this.xPositionOnScreen + 12, this.yPositionOnScreen + 12, containerWidth - 24, computerMenuHeight - 24), Color.Black);
-
-                // Zeichnet den Titel des Terminal-Menüs fett.
-                string title = "ULTIMATE STORAGE SYSTEM";
-
-                // Setze die maximale Breite und den Abstand von rechts
-                float maxTitleWidth = 400f;
-                float rightPadding = 30f;
-
-                // Berechnet die Skalierung basierend auf der Breite des Textes
-                float scale = Math.Min(1f, maxTitleWidth / Game1.dialogueFont.MeasureString(title).X);
-
-                // Berechnet die Position des Titels, rechtsbündig mit 20px Abstand
-                Vector2 titlePosition = new Vector2(
-                    this.xPositionOnScreen + this.containerWidth - rightPadding - maxTitleWidth,
-                    this.yPositionOnScreen + 40
-                );
-
-                Color titleColor = Color.Orange;
-                Color titleShadowColor = Color.Brown;
-
-                // Zeichnet den Schatten des Textes fett und leicht versetzt
-                for (int dx = -1; dx <= 1; dx++)
-                {
-                    for (int dy = -1; dy <= 1; dy++)
-                    {
-                        Game1.spriteBatch.DrawString(
-                            Game1.dialogueFont,
-                            title,
-                            titlePosition + new Vector2(dx + 3, dy + 3),
-                            titleShadowColor,
-                            0f,
-                            Vector2.Zero,
-                            scale,
-                            SpriteEffects.None,
-                            0.86f
-                        );
-                    }
-                }
-
-                // Zeichnet den Titel fett, rechtsbündig
-                for (int dx = -1; dx <= 1; dx++)
-                {
-                    for (int dy = -1; dy <= 1; dy++)
-                    {
-                        Game1.spriteBatch.DrawString(
-                            Game1.dialogueFont,
-                            title,
-                            titlePosition + new Vector2(dx, dy),
-                            titleColor,
-                            0f,
-                            Vector2.Zero,
-                            scale,
-                            SpriteEffects.None,
-                            0.86f
-                        );
-                    }
-                }
-
-                searchBox.Draw(b);
-                Vector2 magnifyingGlassPosition = new Vector2(xPositionOnScreen + 250, yPositionOnScreen + 36);
-                searchBox.DrawMagnifyingGlass(b, magnifyingGlassPosition);
-                itemTable.Draw(b);
-                IClickableMenu.drawTextureBox(b, this.xPositionOnScreen, this.yPositionOnScreen + computerMenuHeight, containerWidth, inventoryMenuHeight, Color.White);
-                playerInventoryMenu.draw(b);
-                scrollbar.Draw(b);
+                this.StorageTab.draw(b);
             }
-            else if (selectedTab == 1)
+            else if (this.selectedTab == 1)
             {
-                // Neuen WorkbenchTab zeichnen
-                WorkbenchTab workbenchTab = new WorkbenchTab(this.xPositionOnScreen, this.yPositionOnScreen);
-                workbenchTab.draw(b);
+                this.workbenchTab.draw(b);
             }
-            else if (selectedTab == 2)
+            else if (this.selectedTab == 2)
             {
-                // Neuen CookingTab zeichnen
-                CookingTab cookingTab = new CookingTab(this.xPositionOnScreen, this.yPositionOnScreen);
-                cookingTab.draw(b);
+                this.cookingTab.draw(b);
             }
-            else if (selectedTab == 3)
+            else if (this.selectedTab == 3)
             {
-                // Neuen ShoppingTab zeichnen
-                ShoppingTab shoppingTab = new ShoppingTab(this.xPositionOnScreen, this.yPositionOnScreen);
-                shoppingTab.draw(b);
+                this.shoppingTab.draw(b);
             }
-
-            // Zeichne die Reiter und Icons nach dem Inhalt der Tabs
-            foreach (var tab in tabs)
+            this.commandInputField.Draw(b);
+            foreach (ClickableTextureComponent tab in this.tabs)
             {
-                bool isSelected = tabs.IndexOf(tab) == selectedTab;
-
-                // Wenn aktiv, verschiebe den Reiter um 8 Pixel nach unten
-                int yOffset = isSelected ? 8 : 0;
-
-                // Zeichne den Tab-Reiter mit dem entsprechenden Offset
+                int yOffset = ((this.tabs.IndexOf(tab) == this.selectedTab) ? 8 : 0);
                 tab.bounds.Y += yOffset;
                 tab.draw(b, Color.White, 0.86f);
                 tab.bounds.Y -= yOffset;
-
-                // Icon für jeden Tab zeichnen
                 Texture2D chestIcon = Game1.objectSpriteSheet;
-                Rectangle sourceRect;
                 Vector2 tabIconPosition;
-
-                // Setze das Icon je nach Tab
-                if (tabs.IndexOf(tab) == 0)
+                Rectangle sourceRect;
+                if (this.tabs.IndexOf(tab) == 0)
                 {
-                    sourceRect = Game1.getSourceRectForStandardTileSheet(chestIcon, 166, 16, 16); // Icon Schatzkiste
-                    tabIconPosition = new Vector2(xPositionOnScreen + 36, yPositionOnScreen - 40 + yOffset);
-                }
-                else if (tabs.IndexOf(tab) == 1)
-                {
-                    // Beispiel: Mauszeiger-Sprite mit Hammer-Symbol zeichnen
-                    Texture2D mouseCursors = Game1.mouseCursors;
-                    Rectangle hammerSourceRect = new Rectangle(64, 368, 16, 16);
-
-                    // Neue Position, an der das Symbol gezeichnet wird
-                    Vector2 hammerIconPosition = new Vector2(xPositionOnScreen + 88, yPositionOnScreen - 64 + yOffset);
-
-                    // Korrektes Zeichnen des Symbols
-                    b.Draw(mouseCursors, hammerIconPosition, hammerSourceRect, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 1f);
-
-                    // Überspringe das Zeichnen des Standard-Icons
-                    continue;
-                }
-                else if (tabs.IndexOf(tab) == 2)
-                {
-                    sourceRect = Game1.getSourceRectForStandardTileSheet(chestIcon, 241, 16, 16); // Icon Hamburger
-                    tabIconPosition = new Vector2(xPositionOnScreen + 172, yPositionOnScreen - 40 + yOffset);
-                }
-                else // Index == 3
-                {
-                    // Hier die Zuweisung von basketTexture
-                    Texture2D basketTexture = ModEntry.basketTexture;
-                    sourceRect = new Rectangle(0, 0, basketTexture.Width, basketTexture.Height);
-
-                    // Position des Basket-Icons anpassen
-                    Vector2 basketIconPosition = new Vector2(tab.bounds.X + 16, tab.bounds.Y + 22 + yOffset);
-                    b.Draw(basketTexture, basketIconPosition, sourceRect, Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 1f);
-
-                    // Überspringe das Zeichnen des Standard-Icons
-                    continue;
-                }
-
-                // Zeichne das Icon
-                b.Draw(chestIcon, tabIconPosition, sourceRect, Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 1f);
-            }
-
-            this.drawMouse(b);
-        }
-
-        // Processes left-clicks on the menu.
-        public override void receiveLeftClick(int x, int y, bool playSound = true)
-        {
-            foreach (var tab in tabs)
-            {
-                if (tab.containsPoint(x, y))
-                {
-                    selectedTab = tabs.IndexOf(tab); // Setze den ausgewählten Reiter
-                    Game1.playSound("smallSelect"); // Spiele einen Soundeffekt ab
-                    return; // Beende die Methode, damit nicht versehentlich das Menü interagiert
-                }
-            }
-
-            // Nur Aktionen verarbeiten, wenn der erste Tab ausgewählt ist
-            if (selectedTab == 0)
-            {
-                if (new Rectangle(searchBox.textBox.X, searchBox.textBox.Y, searchBox.textBox.Width, searchBox.textBox.Height).Contains(x, y))
-                {
-                    searchBox.Click();
+                    sourceRect = Game1.getSourceRectForStandardTileSheet(chestIcon, 166, 16, 16);
+                    tabIconPosition = new Vector2(this.xPositionOnScreen + 36, this.yPositionOnScreen - 40 + yOffset);
                 }
                 else
                 {
-                    inputHandler.ReceiveLeftClick(x, y, playSound);
-                    itemTable.ReceiveLeftClick(x, y);
-
-                    Item clickedItem = GetItemAt(x, y, out bool isInInventory);
-                    if (clickedItem != null)
+                    if (this.tabs.IndexOf(tab) == 1)
                     {
-                        bool shiftPressed = Game1.oldKBState.IsKeyDown(Keys.LeftShift) || Game1.oldKBState.IsKeyDown(Keys.RightShift);
-                        itemTransferManager.HandleLeftClick(clickedItem, isInInventory, shiftPressed);
-
-                        string searchText = searchBox.textBox.Text.TrimStart(searchBox.nonBreakingSpace);
-                        itemTable.FilterItems(searchText);
+                        Texture2D mouseCursors = Game1.mouseCursors;
+                        Rectangle hammerSourceRect = new(64, 368, 16, 16);
+                        Vector2 hammerIconPosition = new(this.xPositionOnScreen + 88, this.yPositionOnScreen - 64 + yOffset);
+                        b.Draw(mouseCursors, hammerIconPosition, hammerSourceRect, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 1f);
+                        continue;
                     }
+                    if (this.tabs.IndexOf(tab) != 2)
+                    {
+                        Texture2D basketTexture = ModEntry.basketTexture;
+                        sourceRect = new Rectangle(0, 0, basketTexture.Width, basketTexture.Height);
+                        Vector2 basketIconPosition = new(tab.bounds.X + 16, tab.bounds.Y + 22 + yOffset);
+                        b.Draw(basketTexture, basketIconPosition, sourceRect, Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 1f);
+                        continue;
+                    }
+                    sourceRect = Game1.getSourceRectForStandardTileSheet(chestIcon, 241, 16, 16);
+                    tabIconPosition = new Vector2(this.xPositionOnScreen + 172, this.yPositionOnScreen - 40 + yOffset);
                 }
+                b.Draw(chestIcon, tabIconPosition, sourceRect, Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 1f);
+            }
+            this.DrawQuickTips(b);
+            this.drawMouse(b);
+        }
 
-                ItemTableRenderer.HandleHeaderClick(x, y, itemTable);
+        private void DrawQuickTips(SpriteBatch b)
+        {
+            ITranslationHelper translation = ModEntry.Instance.Helper.Translation;
+            int x = this.xPositionOnScreen + 15;
+            int yStart = this.yPositionOnScreen + this.height + 10;
+            int lineSpacing = 40;
+            float scale = 1f;
+            Vector2 pos = new(x, yStart);
+            switch (this.selectedTab)
+            {
+                case 0:
+                    DrawLabel("help.storage.leftclick.title", ref pos);
+                    DrawText(ModHelper.Helper.Translation.Get("help.storage.leftclick.desc"), ref pos);
+                    DrawText("|", ref pos);
+                    DrawLabel("help.storage.shiftleftclick.title", ref pos);
+                    DrawText(ModHelper.Helper.Translation.Get("help.storage.shiftleftclick.desc"), ref pos);
+                    break;
+                case 1:
+                    DrawLabel("help.crafting.leftclick.title", ref pos);
+                    DrawText(ModHelper.Helper.Translation.Get("help.crafting.quick.desc.split1"), ref pos);
+                    DrawText("|", ref pos);
+                    DrawLabel("help.crafting.shiftleftclick.title", ref pos);
+                    DrawText(ModHelper.Helper.Translation.Get("help.crafting.quick.desc.split2"), ref pos);
+                    break;
+                case 2:
+                    DrawLabel("help.cooking.leftclick.title", ref pos);
+                    DrawText(ModHelper.Helper.Translation.Get("help.cooking.quick.desc.split1"), ref pos);
+                    DrawText("|", ref pos);
+                    DrawLabel("help.cooking.shiftleftclick.title", ref pos);
+                    DrawText(ModHelper.Helper.Translation.Get("help.cooking.quick.desc.split2"), ref pos);
+                    break;
+                case 3:
+                    DrawLabel("help.shopping.leftclick.title", ref pos);
+                    DrawText(ModHelper.Helper.Translation.Get("help.shopping.leftclick.desc"), ref pos);
+                    break;
+            }
+            pos = new Vector2(x, yStart + lineSpacing);
+            switch (this.selectedTab)
+            {
+                case 0:
+                    DrawLabel("help.storage.rightclick.title", ref pos);
+                    DrawText(ModHelper.Helper.Translation.Get("help.storage.rightclick.desc"), ref pos);
+                    DrawText("|", ref pos);
+                    DrawLabel("help.storage.shiftrightclick.title", ref pos);
+                    DrawText(ModHelper.Helper.Translation.Get("help.storage.shiftrightclick.desc"), ref pos);
+                    break;
+                case 1:
+                    DrawLabel("help.crafting.rightclick.title", ref pos);
+                    DrawText(ModHelper.Helper.Translation.Get("help.crafting.multi.desc"), ref pos);
+                    break;
+                case 2:
+                    DrawLabel("help.cooking.rightclick.title", ref pos);
+                    DrawText(ModHelper.Helper.Translation.Get("help.cooking.multi.desc"), ref pos);
+                    break;
+                case 3:
+                    break;
+            }
+            void DrawLabel(string key, ref Vector2 reference)
+            {
+                b.DrawString(Game1.smallFont, ModHelper.Helper.Translation.Get(key), reference, Color.Orange, 0f, Vector2.Zero, scale, SpriteEffects.None, 1f);
+                reference.X += Game1.smallFont.MeasureString(ModHelper.Helper.Translation.Get(key)).X + 10f;
+            }
+            void DrawText(string text, ref Vector2 reference)
+            {
+                b.DrawString(Game1.smallFont, text, reference, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 1f);
+                reference.X += Game1.smallFont.MeasureString(text).X + 20f;
             }
         }
 
-        // Processes right-clicks on the menu.
+        public override void receiveLeftClick(int x, int y, bool playSound = true)
+        {
+            bool inMenu = x >= this.xPositionOnScreen && x <= this.xPositionOnScreen + this.width && y >= this.yPositionOnScreen && y <= this.yPositionOnScreen + this.height;
+            bool onTabBar = this.tabs.Exists(tab => tab.containsPoint(x, y));
+            if (!inMenu && !onTabBar)
+            {
+                return;
+            }
+            base.receiveLeftClick(x, y, playSound);
+            if (onTabBar)
+            {
+                for (int i = 0; i < this.tabs.Count; i++)
+                {
+                    if (this.tabs[i].containsPoint(x, y))
+                    {
+                        this.selectedTab = i;
+                        this.commandInputField.UpdateTable(this.GetActiveTable());
+                        this.commandInputField.Reset();
+                        this.workbenchTab.ResetSort();
+                        this.cookingTab.ResetSort();
+                        if (this.selectedTab == 0)
+                        {
+                            this.StorageTab.RefreshItems();
+                            this.StorageTab.ResetSort();
+                        }
+                        return;
+                    }
+                }
+            }
+            DynamicTable activeTable = this.GetActiveTable();
+            int prevScroll = activeTable.ScrollIndex;
+            switch (this.selectedTab)
+            {
+                case 0:
+                    this.StorageTab.receiveLeftClick(x, y, playSound);
+                    break;
+                case 1:
+                    this.workbenchTab.receiveLeftClick(x, y, playSound);
+                    break;
+                case 2:
+                    this.cookingTab.receiveLeftClick(x, y, playSound);
+                    break;
+                case 3:
+                    this.shoppingTab.receiveLeftClick(x, y, playSound);
+                    break;
+            }
+            this.commandInputField.UpdateTable(activeTable);
+            activeTable.SortItemsBy(activeTable.SortedColumn, activeTable.isAscending);
+            activeTable.ScrollIndex = Math.Clamp(prevScroll, 0, Math.Max(0, activeTable.GetItemEntriesCount() - activeTable.GetVisibleRows()));
+            activeTable.Scrollbar?.UpdateScrollBarPosition();
+            activeTable.Scrollbar?.ReceiveLeftClick(x, y);
+            activeTable.Scrollbar?.UpdateScrollBarPosition();
+        }
+
+        public override void leftClickHeld(int x, int y)
+        {
+            base.leftClickHeld(x, y);
+            if (this.GetActiveTable() is DynamicTable activeTable)
+            {
+                activeTable.Scrollbar?.LeftClickHeld(x, y);
+            }
+        }
+
+        public override void releaseLeftClick(int x, int y)
+        {
+            base.releaseLeftClick(x, y);
+            if (this.GetActiveTable() is DynamicTable activeTable)
+            {
+                activeTable.Scrollbar?.ReleaseLeftClick(x, y);
+            }
+        }
+
         public override void receiveRightClick(int x, int y, bool playSound = true)
         {
             if (ModEntry.Instance.ignoreNextRightClick)
@@ -290,88 +384,110 @@ namespace UltimateStorageSystem.Drawing
                 ModEntry.Instance.ignoreNextRightClick = false;
                 return;
             }
-
-            if (selectedTab == 0)
+            bool inMenu = x >= this.xPositionOnScreen && x <= this.xPositionOnScreen + this.width && y >= this.yPositionOnScreen && y <= this.yPositionOnScreen + this.height;
+            bool onTab = this.tabs.Exists(tab => tab.containsPoint(x, y));
+            if (!inMenu && !onTab)
             {
-                Item clickedItem = GetItemAt(x, y, out bool isInInventory);
-                if (clickedItem != null)
+                return;
+            }
+            base.receiveRightClick(x, y, playSound);
+            for (int i = 0; i < this.tabs.Count; i++)
+            {
+                if (this.tabs[i].containsPoint(x, y))
                 {
-                    bool shiftPressed = Game1.oldKBState.IsKeyDown(Keys.LeftShift) || Game1.oldKBState.IsKeyDown(Keys.RightShift);
-                    itemTransferManager.HandleRightClick(clickedItem, isInInventory, shiftPressed);
-
-                    string searchText = searchBox.textBox.Text.TrimStart(searchBox.nonBreakingSpace);
-                    itemTable.FilterItems(searchText);
+                    this.selectedTab = i;
+                    this.commandInputField.UpdateTable(this.GetActiveTable());
+                    this.commandInputField.Reset();
+                    this.StorageTab.ResetSort();
+                    this.workbenchTab.ResetSort();
+                    this.cookingTab.ResetSort();
+                    return;
                 }
             }
-        }
-
-        // Retrieves the clicked item from the inventory or table.
-        private Item GetItemAt(int x, int y, out bool isInInventory)
-        {
-            isInInventory = false;
-
-            foreach (ClickableComponent slot in playerInventoryMenu.inventory)
+            var activeTable = this.GetActiveTable();
+            int prevScroll = activeTable.ScrollIndex;
+            switch (this.selectedTab)
             {
-                if (slot.containsPoint(x, y) && playerInventoryMenu.actualInventory.Count > slot.myID)
-                {
-                    isInInventory = true;
-                    return playerInventoryMenu.actualInventory[slot.myID];
-                }
-            }
-
-            for (int i = 0; i < itemTable.GetVisibleRows(); i++)
-            {
-                int index = itemTable.ScrollIndex + i;
-                if (index >= itemTable.GetItemEntries().Count)
+                case 0:
+                    this.StorageTab.receiveRightClick(x, y, playSound);
                     break;
-
-                int startX = itemTable.StartX + 40;
-                int startY = itemTable.StartY + 100;
-                int rowY = startY + 32 * (i + 1) + 10;
-                if (new Rectangle(startX - 20, rowY, 740, 32).Contains(x, y))
-                {
-                    return itemTable.GetItemEntries()[index].Item;
-                }
+                case 1:
+                    this.workbenchTab.receiveRightClick(x, y, playSound);
+                    break;
+                case 2:
+                    this.cookingTab.receiveRightClick(x, y, playSound);
+                    break;
+                case 3:
+                    this.shoppingTab.receiveRightClick(x, y, playSound);
+                    break;
             }
-
-            return null;
+            this.commandInputField.UpdateTable(activeTable);
+            activeTable.SortItemsBy(activeTable.SortedColumn, activeTable.isAscending);
+            activeTable.ScrollIndex = Math.Clamp(prevScroll, 0, Math.Max(0, activeTable.GetItemEntriesCount() - activeTable.GetVisibleRows()));
+            activeTable.Scrollbar?.UpdateScrollBarPosition();
         }
 
-        // Processes holding the left mouse button.
-        public override void leftClickHeld(int x, int y)
-        {
-            inputHandler.LeftClickHeld(x, y);
-        }
-
-        // Processes releasing the left mouse button.
-        public override void releaseLeftClick(int x, int y)
-        {
-            inputHandler.ReleaseLeftClick(x, y);
-        }
-
-        // Processes hover actions.
-        public override void performHoverAction(int x, int y)
-        {
-            inputHandler.PerformHoverAction(x, y);
-            if (selectedTab == 0)
-            {
-                itemTable.PerformHoverAction(x, y);
-            }
-        }
-
-        // Processes keyboard inputs.
-        public override void receiveKeyPress(Keys key)
-        {
-            inputHandler.ReceiveKeyPress(key);
-        }
-
-        // Processes scroll wheel actions.
         public override void receiveScrollWheelAction(int direction)
         {
-            if (selectedTab == 0)
+            base.receiveScrollWheelAction(direction);
+            if (this.selectedTab == 0)
             {
-                inputHandler.ReceiveScrollWheelAction(direction);
+                this.StorageTab.receiveScrollWheelAction(direction);
             }
+            else if (this.selectedTab == 1)
+            {
+                this.workbenchTab.receiveScrollWheelAction(direction);
+            }
+            else if (this.selectedTab == 2)
+            {
+                this.cookingTab.receiveScrollWheelAction(direction);
+            }
+            else if (this.selectedTab != 3)
+            {
+            }
+        }
+
+        public override void receiveKeyPress(Keys key)
+        {
+            if (key == Keys.Escape && this.selectedTab == 1 && this.workbenchTab != null && this.workbenchTab.craftMode)
+            {
+                this.workbenchTab.CancelCraftMode();
+            }
+            else if (key == Keys.Escape)
+            {
+                this.exitThisMenu();
+                Game1.playSound("bigDeSelect");
+            }
+            else
+            {
+                this.commandInputField.ReceiveKeyPress(key);
+            }
+        }
+
+        public override void performHoverAction(int x, int y)
+        {
+            base.performHoverAction(x, y);
+            if (this.selectedTab == 0)
+            {
+                this.StorageTab.performHoverAction(x, y);
+            }
+            else if (this.selectedTab == 1)
+            {
+                this.workbenchTab.performHoverAction(x, y);
+            }
+            else if (this.selectedTab == 2)
+            {
+                this.cookingTab.performHoverAction(x, y);
+            }
+            else if (this.selectedTab != 3)
+            {
+            }
+        }
+
+        public override void update(GameTime time)
+        {
+            base.update(time);
+            this.commandInputField.Update(time);
         }
     }
 }

@@ -1,310 +1,245 @@
-﻿using StardewModdingAPI;
-using StardewValley.Locations;
+using System.Reflection;
+using HarmonyLib;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
-using Microsoft.Xna.Framework;
+using StardewValley.Locations;
 using StardewValley.Objects;
-using System.Collections.Generic;
 using UltimateStorageSystem.Drawing;
+using UltimateStorageSystem.Interfaces;
 using UltimateStorageSystem.Tools;
-using UltimateStorageSystem.Overrides;
-using System.Linq;
-using System.IO;
-using System.Xml.Serialization;
-using Microsoft.Xna.Framework.Graphics;
-
-#nullable disable
+using UltimateStorageSystem.Utilities;
 
 namespace UltimateStorageSystem
 {
-    [XmlInclude(typeof(CustomWorkbench))]
-    public class ModConfig
-    {
-        public string OpenFarmLinkTerminalHotkey { get; set; } = "";  // Standardwert ist ein leerer String
-    }
-
     public class ModEntry : Mod
     {
-        public static ModEntry Instance;
-        public static Texture2D basketTexture;
-        private ModConfig config;
-        private SButton? openTerminalHotkey;  // Nullable SButton für den Hotkey
-        private readonly string farmLinkTerminalName = "holybananapants.UltimateStorageSystemContentPack_FarmLinkTerminal";
+        [HarmonyPatch(typeof(GameLocation), "draw")]
+        public static class GameLocationDrawPatch
+        {
+            [HarmonyPostfix]
+            public static void Postfix(GameLocation __instance, SpriteBatch b)
+            {
+                if (BlockerOverlayTexture == null || __instance?.Objects == null)
+                {
+                    return;
+                }
+                float scale = 1f;
+                foreach (KeyValuePair<Vector2, StardewValley.Object> pair in __instance.Objects.Pairs)
+                {
+                    Vector2 tile = pair.Key;
+                    if (pair.Value is Chest chest && ChestHasBlocker(chest))
+                    {
+                        float drawPosX = tile.X * 64f + 32f - BlockerOverlayTexture.Width * scale / 2f - 15f;
+                        float drawPosY = tile.Y * 64f - BlockerOverlayTexture.Height * scale + 50f;
+                        Vector2 drawPos = Game1.GlobalToLocal(Game1.viewport, new Vector2(drawPosX, drawPosY));
+                        float sortPixelY_Bottom = (tile.Y + 1f) * 64f;
+                        float layerDepth = Math.Clamp((sortPixelY_Bottom - 1f) / 10000f, 0f, 1f);
+                        b.Draw(BlockerOverlayTexture, drawPos, new Rectangle(0, 0, BlockerOverlayTexture.Width, BlockerOverlayTexture.Height), Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, layerDepth);
+                    }
+                }
+                if (__instance.GetType() == typeof(FarmHouse) && __instance is FarmHouse fh)
+                {
+                    Chest fridge = fh.fridge.Value;
+                    if (fridge != null && ChestHasBlocker(fridge))
+                    {
+                        Vector2 fridgeTile = fh.fridgePosition.ToVector2();
+                        float overlayScale = 1f;
+                        float drawPosX2 = fridgeTile.X * 64f + 32f - BlockerOverlayTexture.Width * overlayScale / 2f - 15f;
+                        float drawPosY2 = (fridgeTile.Y + 1f) * 64f - BlockerOverlayTexture.Height * overlayScale - 10f;
+                        Vector2 drawPos2 = Game1.GlobalToLocal(Game1.viewport, new Vector2(drawPosX2, drawPosY2));
+                        float layerDepth2 = ((fridgeTile.Y + 1f) * 64f - 1f) / 10000f;
+                        b.Draw(BlockerOverlayTexture, drawPos2, null, Color.White, 0f, Vector2.Zero, overlayScale, SpriteEffects.None, layerDepth2);
+                    }
+                }
+                if (__instance is IslandFarmHouse islandHouse)
+                {
+                    Chest islandFridge = islandHouse.fridge.Value;
+                    if (islandFridge != null && ChestHasBlocker(islandFridge))
+                    {
+                        Vector2 fridgeTile2 = islandHouse.fridgePosition.ToVector2();
+                        float overlayScale2 = 1f;
+                        float drawPosX3 = fridgeTile2.X * 64f + 32f - BlockerOverlayTexture.Width * overlayScale2 / 2f - 15f;
+                        float drawPosY3 = (fridgeTile2.Y + 1f) * 64f - BlockerOverlayTexture.Height * overlayScale2 - 10f;
+                        Vector2 drawPos3 = Game1.GlobalToLocal(Game1.viewport, new Vector2(drawPosX3, drawPosY3));
+                        float layerDepth3 = ((fridgeTile2.Y + 1f) * 64f - 1f) / 10000f;
+                        b.Draw(BlockerOverlayTexture, drawPos3, null, Color.White, 0f, Vector2.Zero, overlayScale2, SpriteEffects.None, layerDepth3);
+                    }
+                }
+            }
+        }
+
+        public static ModEntry Instance = null!;
+
+        public static Texture2D basketTexture = null!;
+
+        public static Texture2D BlockerOverlayTexture = null!;
+
+        public static VisitedLocationManager LocationTracker = null!;
+
         public bool ignoreNextRightClick = true;
+
+        private ModConfig config = null!;
+
+        private SButton? openTerminalHotkey;
+
+        private readonly string farmLinkTerminalName = "holybananapants.UltimateStorageSystemContentPack_FarmLinkTerminal";
+
+        private readonly Dictionary<string, string> vendorMapping = new()
+        {
+            { "Pierre", "SeedShop" },
+            { "Marnie", "AnimalShop" },
+            { "Robin", "Carpenter" },
+            { "Dwarf", "Dwarf" }
+        };
 
         public override void Entry(IModHelper helper)
         {
             Instance = this;
-
-            // Initiales Laden der Konfiguration aus der config.json
-            LoadConfig();
-
-            // Laden der Texturen aus dem Assets Ordner            
-            basketTexture = helper.ModContent.Load<Texture2D>("Assets/basket.png");
-
-            helper.Events.Input.ButtonPressed += OnButtonPressed;
-            helper.Events.World.ObjectListChanged += OnObjectListChanged;
-            helper.Events.Player.Warped += OnLocationChanged;
-            helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
-            helper.Events.GameLoop.Saving += OnSaving;
-            helper.Events.GameLoop.Saved += OnSaved;
+            ModHelper.Init(helper);
+            this.LoadConfig();
+            basketTexture = helper.ModContent.Load<Texture2D>("assets/basket.png");
+            BlockerOverlayTexture = helper.ModContent.Load<Texture2D>("assets/blockTerminal.png");
+            LocationTracker = new VisitedLocationManager(helper);
+            Harmony harmony = new(this.ModManifest.UniqueID);
+            harmony.PatchAll(Assembly.GetExecutingAssembly());
+            helper.Events.GameLoop.GameLaunched += this.OnGameLaunched;
+            helper.Events.Input.ButtonPressed += this.OnButtonPressed;
+            helper.Events.GameLoop.SaveLoaded += this.OnSaveLoaded;
         }
 
         private void LoadConfig()
         {
             try
             {
-                config = Helper.ReadConfig<ModConfig>();
-
-                // Versuche, den Hotkey zu parsen
-                if (string.IsNullOrWhiteSpace(config.OpenFarmLinkTerminalHotkey) ||
-                    !Enum.TryParse(config.OpenFarmLinkTerminalHotkey.ToUpper(), true, out SButton parsedHotkey))
+                this.config = this.Helper.ReadConfig<ModConfig>();
+                this.openTerminalHotkey = this.config.OpenFarmLinkTerminalHotkey.GetValueOrDefault();
+                if (this.openTerminalHotkey == (SButton?)0)
                 {
-                    openTerminalHotkey = null;
-
-                    // Hinweis anzeigen, wenn kein Hotkey gesetzt ist
-                    Monitor.Log("No hotkey is set for opening the FarmLink Terminal. You can set a hotkey in the config.json file located in the mod folder if desired.", LogLevel.Info);
+                    this.Monitor.Log("No hotkey is set for opening the FarmLink Terminal. You can set a hotkey in GenericModConfigMenu if desired.", (LogLevel)2);
                 }
-                else
-                {
-                    openTerminalHotkey = parsedHotkey;
-                }
+                this.OverrideShopData();
             }
             catch
             {
-                openTerminalHotkey = null;  // Falls ein Fehler auftritt, setzen Sie den Hotkey auf null
+                this.openTerminalHotkey = 0;
             }
         }
 
-        private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
+        private void OverrideShopData()
         {
-            foreach (var location in Game1.locations)
-            {
-                CheckForFarmLinkTerminal(location);
-            }
+            ShopDataManager.UpdateShopData(this.Helper, this.Monitor, this.config.TerminalPrice, this.config.Vendor);
         }
 
-        private void OnSaving(object sender, SavingEventArgs e)
+        private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
         {
-            foreach (var location in Game1.locations)
+            var configMenu = this.Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+            if (configMenu == null)
             {
-                ConvertCustomWorkbenchesToStandard(location);
+                return;
             }
-        }
-
-        private void OnSaved(object sender, SavedEventArgs e)
-        {
-            foreach (var location in Game1.locations)
+            configMenu.Register(this.ModManifest, delegate
             {
-                CheckForFarmLinkTerminal(location);
-            }
-        }
-
-        private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
-        {
-            // Prüfen, ob der Hotkey definiert ist und gedrückt wurde
-            if (openTerminalHotkey.HasValue && Context.IsPlayerFree && e.Button == openTerminalHotkey)
+                this.config = new ModConfig();
+            }, delegate
             {
-                ignoreNextRightClick = false;
-                if (IsFarmLinkTerminalPlaced())
+                //IL_004d: Unknown result type (might be due to invalid IL or missing references)
+                if (this.vendorMapping.TryGetValue(this.config.Vendor, out var value))
                 {
-                    OpenFarmLinkTerminalMenu();
+                    this.config.Vendor = value;
+                }
+                this.Helper.WriteConfig(this.config);
+                this.openTerminalHotkey = this.config.OpenFarmLinkTerminalHotkey.GetValueOrDefault();
+                this.OverrideShopData();
+            });
+            configMenu.AddSectionTitle(this.ModManifest, () => ModHelper.Helper.Translation.Get("menu.shopSettings"), () => ModHelper.Helper.Translation.Get("menu.shopSettingsTooltip"));
+            configMenu.AddTextOption(this.ModManifest, () => this.vendorMapping.FirstOrDefault(x => x.Value == this.config.Vendor).Key ?? "Dwarf", delegate (string value)
+            {
+                if (this.vendorMapping.TryGetValue(value, out var value2))
+                {
+                    this.config.Vendor = value2;
+                }
+            }, () => ModHelper.Helper.Translation.Get("menu.vendor"), () => ModHelper.Helper.Translation.Get("menu.vendorTooltip"), this.vendorMapping.Keys.ToArray());
+            configMenu.AddNumberOption(this.ModManifest, () => this.config.TerminalPrice, delegate (int value)
+            {
+                this.config.TerminalPrice = value;
+            }, () => ModHelper.Helper.Translation.Get("menu.price"), () => ModHelper.Helper.Translation.Get("menu.priceTooltip"), 1, 100000, 1000);
+            configMenu.AddParagraph(this.ModManifest, () => "");
+            configMenu.AddParagraph(this.ModManifest, () => "");
+            configMenu.AddParagraph(this.ModManifest, () => ModHelper.Helper.Translation.Get("menu.noticeTitle"));
+            configMenu.AddParagraph(this.ModManifest, () => ModHelper.Helper.Translation.Get("menu.noticeContent"));
+            configMenu.AddParagraph(this.ModManifest, () => ModHelper.Helper.Translation.Get("menu.command"));
+            configMenu.AddSectionTitle(this.ModManifest, () => ModHelper.Helper.Translation.Get("menu.hotkeys"), () => ModHelper.Helper.Translation.Get("menu.hotkeysTooltip"));
+            configMenu.AddKeybind(this.ModManifest, () => this.config.OpenFarmLinkTerminalHotkey.GetValueOrDefault(), delegate (SButton value)
+            {
+                //IL_0007: Unknown result type (might be due to invalid IL or missing references)
+                //IL_0014: Unknown result type (might be due to invalid IL or missing references)
+                this.config.OpenFarmLinkTerminalHotkey = value;
+                this.openTerminalHotkey = value;
+            }, () => ModHelper.Helper.Translation.Get("menu.hotkeyOpen"), () => ModHelper.Helper.Translation.Get("menu.hotkeyOpenTooltip"));
+        }
+
+        private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
+        {
+            this.LoadConfig();
+        }
+
+        private void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
+        {
+            if (this.openTerminalHotkey.HasValue && Context.IsPlayerFree && (SButton?)e.Button == this.openTerminalHotkey)
+            {
+                this.ignoreNextRightClick = false;
+                if (this.IsFarmLinkTerminalPlaced())
+                {
+                    this.OpenFarmLinkTerminalMenu();
                 }
             }
-
-            if (Context.IsPlayerFree && e.Button.IsActionButton())
+            if (Context.IsPlayerFree && SButtonExtensions.IsActionButton(e.Button))
             {
                 Vector2 tile = e.Cursor.Tile;
-                if (IsFarmLinkTerminalOnTile(tile, out StardewValley.Object terminalObject))
+                if (this.IsFarmLinkTerminalOnTile(tile, out var terminalObject) && FarmLinkTerminal.IsPlayerBelowTileAndFacingUp(Game1.player, terminalObject.TileLocation))
                 {
-                    if (FarmLinkTerminal.IsPlayerBelowTileAndFacingUp(Game1.player, terminalObject.TileLocation))
-                    {
-                        ignoreNextRightClick = true;
-                        OpenFarmLinkTerminalMenu();
-                    }
+                    this.ignoreNextRightClick = true;
+                    this.OpenFarmLinkTerminalMenu();
                 }
             }
-        }
-
-        private void OnLocationChanged(object sender, WarpedEventArgs e)
-        {
-            CheckForFarmLinkTerminal(e.NewLocation);
-        }
-
-        private void OnObjectListChanged(object sender, ObjectListChangedEventArgs e)
-        {
-            if (e.Removed.Any(obj => obj.Value.Name == farmLinkTerminalName))
-            {
-                RevertCustomWorkbenches(e.Location);
-            }
-
-            CheckForFarmLinkTerminal(e.Location);
         }
 
         private bool IsFarmLinkTerminalPlaced()
         {
-            // Prüfe im FarmHouse
-            if (Game1.locations.OfType<FarmHouse>().Any(location => location.objects.Values.Any(obj => obj.Name == farmLinkTerminalName)))
+            if (Game1.locations.OfType<FarmHouse>().Any(location => location.objects.Values.Any(obj => obj.Name == this.farmLinkTerminalName)))
             {
                 return true;
             }
-
-            // Prüfe auf der Farm
-            if (Game1.locations.OfType<Farm>().Any(location => location.objects.Values.Any(obj => obj.Name == farmLinkTerminalName)))
+            if (Game1.locations.OfType<Farm>().Any(location => location.objects.Values.Any(obj => obj.Name == this.farmLinkTerminalName)))
             {
                 return true;
             }
-
             return false;
-        }
-
-        private void CheckForFarmLinkTerminal(GameLocation location)
-        {
-            List<KeyValuePair<Vector2, Workbench>> workbenchesToReplace = new List<KeyValuePair<Vector2, Workbench>>();
-
-            foreach (var pair in location.objects.Pairs)
-            {
-                if (pair.Value is Workbench workbench && !(pair.Value is CustomWorkbench))
-                {
-                    if (IsTerminalAdjacent(pair.Key, location))
-                    {
-                        workbenchesToReplace.Add(new KeyValuePair<Vector2, Workbench>(pair.Key, workbench));
-                    }
-                }
-            }
-
-            foreach (var pair in workbenchesToReplace)
-            {
-                location.objects.Remove(pair.Key);
-                location.objects.Add(pair.Key, new CustomWorkbench(pair.Key));
-            }
-        }
-
-        private bool IsTerminalAdjacent(Vector2 tileLocation, GameLocation location)
-        {
-            foreach (var offset in AdjacentTilesOffsets)
-            {
-                Vector2 adjacentTile = tileLocation + offset;
-                if (location.objects.TryGetValue(adjacentTile, out StardewValley.Object adjacentObject) && adjacentObject.Name == farmLinkTerminalName)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private void RevertCustomWorkbenches(GameLocation location)
-        {
-            List<Vector2> customWorkbenchesToRevert = new List<Vector2>();
-
-            foreach (var pair in location.objects.Pairs)
-            {
-                if (pair.Value is CustomWorkbench)
-                {
-                    customWorkbenchesToRevert.Add(pair.Key);
-                }
-            }
-
-            foreach (var tileLocation in customWorkbenchesToRevert)
-            {
-                location.objects.Remove(tileLocation);
-                location.objects.Add(tileLocation, new Workbench(tileLocation));
-            }
-        }
-
-        private void ConvertCustomWorkbenchesToStandard(GameLocation location)
-        {
-            List<Vector2> customWorkbenchesToRevert = new List<Vector2>();
-
-            foreach (var pair in location.objects.Pairs)
-            {
-                if (pair.Value is CustomWorkbench)
-                {
-                    customWorkbenchesToRevert.Add(pair.Key);
-                }
-            }
-
-            foreach (var tileLocation in customWorkbenchesToRevert)
-            {
-                location.objects.Remove(tileLocation);
-                location.objects.Add(tileLocation, new Workbench(tileLocation));
-            }
         }
 
         private bool IsFarmLinkTerminalOnTile(Vector2 tile, out StardewValley.Object terminalObject)
         {
-            return (Game1.currentLocation.objects.TryGetValue(tile, out terminalObject) && terminalObject.Name == farmLinkTerminalName) ||
-                   (Game1.currentLocation.objects.TryGetValue(tile + new Vector2(0, 1), out terminalObject) && terminalObject.Name == farmLinkTerminalName);
+            return (Game1.currentLocation.objects.TryGetValue(tile, out terminalObject) && terminalObject.Name == this.farmLinkTerminalName) || (Game1.currentLocation.objects.TryGetValue(tile + new Vector2(0f, 1f), out terminalObject) && terminalObject.Name == this.farmLinkTerminalName);
         }
 
         private void OpenFarmLinkTerminalMenu()
         {
-            var itemTransferManager = new ItemTransferManager(GetAllChests(), new ItemTable(0, 0));
+            FarmLinkTerminalMenu farmLinkTerminalMenu = new(new List<Chest>());
+            ItemTransferManager itemTransferManager = new(FarmLinkTerminalMenu.GetAllStorageObjects(), new DynamicTable(0, 0, new List<string>(), new List<int>(), new List<bool>(), new List<TableRowWithIcon>(), null));
             itemTransferManager.UpdateChestItemsAndSort();
-            Game1.activeClickableMenu = new FarmLinkTerminalMenu(GetAllChests());
+            Game1.activeClickableMenu = farmLinkTerminalMenu;
         }
 
-        private List<Chest> GetAllChests()
+        public static bool ChestHasBlocker(Chest chest)
         {
-            List<Chest> chests = new List<Chest>();
-
-            void AddChestsFromLocation(GameLocation location)
+            if (chest?.Items == null)
             {
-                // Alle Objekte in der Location durchsuchen
-                foreach (var item in location.objects.Values)
-                {
-                    if (item is Chest chest &&
-                        (chest.SpecialChestType == Chest.SpecialChestTypes.None || chest.SpecialChestType == Chest.SpecialChestTypes.BigChest))
-                    {
-                        chests.Add(chest);
-                    }
-                }
-
-                // Kühlschrank im Farmhaus prüfen
-                if (location is FarmHouse)
-                {
-                    Chest fridge = (location as FarmHouse).fridge.Value;                    
-                    if (fridge != null)
-                    {
-                        chests.Add(fridge);
-                    }
-                }
-
-                // Gebäude in spezifischen Locations durchsuchen
-                if (location is Farm || location.Name == "FarmHouse" || location.Name == "Shed" || location.Name.Contains("Cabin"))
-                {
-                    if (location is Farm farm)
-                    {
-                        foreach (var building in farm.buildings)
-                        {
-                            if (building.indoors.Value != null)
-                            {
-                                AddChestsFromLocation(building.indoors.Value);
-                            }
-                        }
-                    }
-                }
+                return false;
             }
-
-            // Durchlaufe alle Locations im Spiel
-            foreach (var location in Game1.locations)
-            {
-                AddChestsFromLocation(location);
-            }
-
-            return chests;
+            return chest.Items.Any(item => item is StardewValley.Object obj && obj.QualifiedItemId == "(BC)holybananapants.UltimateStorageSystemContentPack_BlockTerminal");
         }
-
-        private static readonly Vector2[] AdjacentTilesOffsets = new Vector2[]
-        {
-            new Vector2(-1f, 1f),
-            new Vector2(0f, 1f),
-            new Vector2(1f, 1f),
-            new Vector2(-1f, 0f),
-            new Vector2(1f, 0f),
-            new Vector2(-1f, -1f),
-            new Vector2(0f, -1f),
-            new Vector2(1f, -1f)
-        };
     }
 }

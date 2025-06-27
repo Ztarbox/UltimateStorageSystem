@@ -1,6 +1,9 @@
 ﻿{
-    "FarmLinkTerminal_name": "Terminale FarmLink",
-    "FarmLinkTerminal_description": "Accedi e gestisci tutti i tuoi oggetti da un unico computer.",
-    "FarmLinkTerminal_DisplayName": "Terminale FarmLink",
-    "FarmLinkTerminal_Recipe": "Terminale FarmLink"
+  "FarmLinkTerminal_name": "Terminale FarmLink",
+  "FarmLinkTerminal_description": "Accedi e gestisci tutti i tuoi oggetti da un unico computer.",
+  "FarmLinkTerminal_DisplayName": "Terminale FarmLink",
+  "FarmLinkTerminal_Recipe": "Terminale FarmLink",
+
+  "BlockTerminal_DisplayName": "Blocco Terminale",
+  "BlockTerminal_Description": "Impedisce al Terminale FarmLink di accedere a qualsiasi contenitore che contiene questo oggetto."
 }

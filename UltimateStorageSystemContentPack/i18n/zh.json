@@ -1,6 +1,9 @@
 ﻿{
-    "FarmLinkTerminal_name": "农场链接终端",
-    "FarmLinkTerminal_description": "通过一台计算机访问和管理所有物品。",
-    "FarmLinkTerminal_DisplayName": "农场链接终端",
-    "FarmLinkTerminal_Recipe": "农场链接终端"
+  "FarmLinkTerminal_name": "农场链接终端",
+  "FarmLinkTerminal_description": "通过一台计算机访问和管理所有物品。",
+  "FarmLinkTerminal_DisplayName": "农场链接终端",
+  "FarmLinkTerminal_Recipe": "农场链接终端",
+
+  "BlockTerminal_DisplayName": "终端阻挡器",
+  "BlockTerminal_Description": "防止FarmLink终端访问包含此物品的储物箱。"
 }

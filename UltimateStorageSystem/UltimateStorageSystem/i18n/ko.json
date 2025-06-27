@@ -1,3 +1,58 @@
 ﻿{
-    "no_storage_space_message": "이 항목의 저장 공간을 먼저 선택하세요!"
+  "no_storage_space_message": "이 항목의 저장 공간을 먼저 선택하세요",
+  "not_enough_ingredients": "재료가 부족합니다",
+
+  "Search": "검색: ",
+
+  "menu.shopSettings": "상점 설정",
+  "menu.shopSettingsTooltip": "터미널의 판매자 및 가격 구성.",
+  "menu.vendor": "판매자",
+  "menu.vendorTooltip": "터미널을 제공하는 판매자.",
+  "menu.price": "터미널 가격",
+  "menu.priceTooltip": "FarmLink 터미널의 가격.",
+  "menu.noticeTitle": "*** 주의 ***",
+  "menu.noticeContent": "판매자와 가격 변경 사항은 게임을 다시 시작한 후에만 적용됩니다.\n\n다시 시작하지 않고 변경 사항을 적용하려면 다음 콘솔 명령을 입력하세요:",
+  "menu.command": "'patch reload holybananapants.UltimateStorageSystemContentPack'",
+  "menu.hotkeys": "단축키",
+  "menu.hotkeysTooltip": "터미널에 접근하기 위한 키 설정.",
+  "menu.hotkeyOpen": "터미널 열기 단축키",
+  "menu.hotkeyOpenTooltip": "FarmLink 터미널을 열기 위한 키.",
+
+  "column.item": "아이템",
+  "column.craft_item": "제작",
+  "column.qty": "수량",
+  "column.value": "가치",
+  "column.total": "총계",
+  "column.recipe": "레시피",
+  "column.buffs": "버프",
+  "column.ingredients": "재료",
+  "column.material": "재료",
+  "column.max": "최대",
+  "column.type": "유형",
+
+  "help.storage.leftclick.title": "왼쪽 클릭:",
+  "help.storage.shiftleftclick.title": "시프트 키 + 왼쪽 클릭:",
+  "help.storage.rightclick.title": "오른쪽 클릭:",
+  "help.storage.shiftrightclick.title": "시프트 키 + 오른쪽 클릭:",
+  "help.storage.leftclick.desc": "전체 스택 전송",
+  "help.storage.shiftleftclick.desc": "스택 절반 전송",
+  "help.storage.rightclick.desc": "1개 전송",
+  "help.storage.shiftrightclick.desc": "10개 전송",
+
+  "help.crafting.leftclick.title": "왼쪽 클릭:",
+  "help.crafting.shiftleftclick.title": "시프트 키 + 왼쪽 클릭:",
+  "help.crafting.rightclick.title": "오른쪽 클릭:",
+  "help.crafting.quick.desc.split1": "1개 제작",
+  "help.crafting.quick.desc.split2": "5개 제작",
+  "help.crafting.multi.desc": "멀티제작: 마우스 휠로 수량 설정 후 빈 슬롯에 왼쪽 클릭",
+
+  "help.cooking.leftclick.title": "왼쪽 클릭:",
+  "help.cooking.shiftleftclick.title": "시프트 키 + 왼쪽 클릭:",
+  "help.cooking.rightclick.title": "오른쪽 클릭:",
+  "help.cooking.quick.desc.split1": "요리 1개 조리",
+  "help.cooking.quick.desc.split2": "요리 5개 조리",
+  "help.cooking.multi.desc": "멀티요리: 마우스 휠로 수량 설정 후 빈 슬롯에 왼쪽 클릭",
+
+  "help.shopping.leftclick.title": "왼쪽 클릭:",
+  "help.shopping.leftclick.desc": "보기 전용 – 사용 가능한 동작 없음"
 }

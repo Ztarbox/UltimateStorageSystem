@@ -1,4 +1,58 @@
 ﻿{
-    "no_storage_space_message": "まず、このアイテムの保管場所を選んでください！"
-}
+  "no_storage_space_message": "まず、このアイテムの保管場所を選んでください",
+  "not_enough_ingredients": "材料が足りません",
 
+  "Search": "検索: ",
+
+  "menu.shopSettings": "ショップ設定",
+  "menu.shopSettingsTooltip": "端末の販売者と価格の設定。",
+  "menu.vendor": "販売者",
+  "menu.vendorTooltip": "端末を提供する販売者。",
+  "menu.price": "端末の価格",
+  "menu.priceTooltip": "FarmLink端末の価格。",
+  "menu.noticeTitle": "*** 注意 ***",
+  "menu.noticeContent": "販売者と価格の変更は、ゲームを再起動した後にのみ有効になります。\n\n再起動せずに変更を適用するには、次のコンソールコマンドを入力してください：",
+  "menu.command": "'patch reload holybananapants.UltimateStorageSystemContentPack'",
+  "menu.hotkeys": "ホットキー",
+  "menu.hotkeysTooltip": "端末にアクセスするためのキー設定。",
+  "menu.hotkeyOpen": "端末を開くホットキー",
+  "menu.hotkeyOpenTooltip": "FarmLink端末を開くキー。",
+
+  "column.item": "アイテム",
+  "column.craft_item": "クラフト",
+  "column.qty": "数量",
+  "column.value": "価値",
+  "column.total": "合計",
+  "column.recipe": "レシピ",
+  "column.buffs": "効果",
+  "column.ingredients": "材料",
+  "column.material": "材料",
+  "column.max": "最大",
+  "column.type": "種類",
+
+  "help.storage.leftclick.title": "左クリック：",
+  "help.storage.shiftleftclick.title": "シフトキー + 左クリック：",
+  "help.storage.rightclick.title": "右クリック：",
+  "help.storage.shiftrightclick.title": "シフトキー + 右クリック：",
+  "help.storage.leftclick.desc": "スタック全体を移動",
+  "help.storage.shiftleftclick.desc": "スタックの半分を移動",
+  "help.storage.rightclick.desc": "1個を移動",
+  "help.storage.shiftrightclick.desc": "10個を移動",
+
+  "help.crafting.leftclick.title": "左クリック：",
+  "help.crafting.shiftleftclick.title": "シフトキー + 左クリック：",
+  "help.crafting.rightclick.title": "右クリック：",
+  "help.crafting.quick.desc.split1": "1個を作成",
+  "help.crafting.quick.desc.split2": "5個を作成",
+  "help.crafting.multi.desc": "マルチクラフト：スクロールホイールで数を設定し、空きスロットを左クリック",
+
+  "help.cooking.leftclick.title": "左クリック：",
+  "help.cooking.shiftleftclick.title": "シフトキー + 左クリック：",
+  "help.cooking.rightclick.title": "右クリック：",
+  "help.cooking.quick.desc.split1": "1品を調理",
+  "help.cooking.quick.desc.split2": "5品を調理",
+  "help.cooking.multi.desc": "マルチクック：スクロールホイールで数を設定し、空きスロットを左クリック",
+
+  "help.shopping.leftclick.title": "左クリック：",
+  "help.shopping.leftclick.desc": "表示のみ – 操作不可"
+}

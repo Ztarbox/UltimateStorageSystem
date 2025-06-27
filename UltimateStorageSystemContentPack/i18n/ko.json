@@ -1,6 +1,9 @@
 ﻿{
-    "FarmLinkTerminal_name": "팜링크 터미널",
-    "FarmLinkTerminal_description": "단일 컴퓨터에서 모든 아이템에 접근하고 관리하세요.",
-    "FarmLinkTerminal_DisplayName": "팜링크 터미널",
-    "FarmLinkTerminal_Recipe": "팜링크 터미널"
+  "FarmLinkTerminal_name": "팜링크 터미널",
+  "FarmLinkTerminal_description": "단일 컴퓨터에서 모든 아이템에 접근하고 관리하세요.",
+  "FarmLinkTerminal_DisplayName": "팜링크 터미널",
+  "FarmLinkTerminal_Recipe": "팜링크 터미널",
+
+  "BlockTerminal_DisplayName": "터미널 차단기",
+  "BlockTerminal_Description": "이 아이템이 들어 있는 저장소에 FarmLink 터미널이 접근하지 못하게 합니다."
 }

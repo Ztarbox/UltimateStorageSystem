@@ -1,17 +1,16 @@
 {
-    "Name": "UltimateStorageSystem",
-    "Author": "holybananapants",
-    "Version": "1.1.4",
-    "Description": "Adds AutoSort, Workbench Access & Global Inventory to FarmLink Terminal",
-    "UniqueID": "holybananapants.UltimateStorageSystem",
-    "EntryDll": "UltimateStorageSystem.dll",
-    "MinimumApiVersion": "4.0.0",
-    "UpdateKeys": [ "Nexus: 26919" ],
-
-    "Dependencies": [
-        {
-            "UniqueID": "holybananapants.UltimateStorageSystemContentPack",
-            "MinimumVersion": "1.0.0"
-        }
-    ]
+  "Name": "UltimateStorageSystem",
+  "Author": "holybananapants",
+  "Version": "1.2.5",
+  "Description": "Adds AutoSort, Workbench Access & Global Inventory to FarmLink Terminal",
+  "UniqueID": "holybananapants.UltimateStorageSystem",
+  "EntryDll": "UltimateStorageSystem.dll",
+  "MinimumApiVersion": "4.2.1",
+  "UpdateKeys": [ "Nexus:26919" ],
+  "Dependencies": [
+    {
+      "UniqueID": "holybananapants.UltimateStorageSystemContentPack",
+      "MinimumVersion": "1.2.4"
+    }
+  ]
 }
