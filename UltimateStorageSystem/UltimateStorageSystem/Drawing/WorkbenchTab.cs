@@ -43,10 +43,10 @@ namespace UltimateStorageSystem.Drawing
             this.TerminalMenu = terminalMenu;
             this.playerInventoryMenu = inventoryMenu;
             this.craftingRecipes = (from name in CraftingRecipe.craftingRecipes.Keys
-                               where Game1.player.craftingRecipes.ContainsKey(name)
-                               select new CraftingRecipe(name) into recipe
-                               where recipe != null
-                               select recipe).ToList();
+                                    where Game1.player.craftingRecipes.ContainsKey(name)
+                                    select new CraftingRecipe(name) into recipe
+                                    where recipe != null
+                                    select recipe).ToList();
             this.craftingRecipes.Add(new CraftingRecipeForBlockTerminal());
             List<string> columnHeaders = new()
             {
@@ -141,115 +141,111 @@ namespace UltimateStorageSystem.Drawing
         {
             if (this.craftMode && this.currentRecipe != null)
             {
-                foreach (ClickableComponent slot in this.playerInventoryMenu.inventory)
+                var slotID = this.playerInventoryMenu.getInventoryPositionOfClick(x, y);
+                Item existingItem = this.playerInventoryMenu.actualInventory[slotID];
+                Item result;
+                if (this.currentRecipe is CraftingRecipeForBlockTerminal)
                 {
-                    if (slot.containsPoint(x, y) && this.playerInventoryMenu.actualInventory.Count > slot.myID)
-                    {
-                        Item existingItem = this.playerInventoryMenu.actualInventory[slot.myID];
-                        Item result;
-                        if (this.currentRecipe is CraftingRecipeForBlockTerminal)
-                        {
-                            result = ItemRegistry.Create("(BC)holybananapants.UltimateStorageSystemContentPack_BlockTerminal");
-                            result.Stack = this.craftAmount;
-                        }
-                        else
-                        {
-                            result = this.currentRecipe.createItem();
-                            if (result == null)
-                            {
-                                Game1.playSound("cancel");
-                                break;
-                            }
-                            result.Stack = this.craftAmount;
-                        }
-                        if (existingItem == null)
-                        {
-                            this.playerInventoryMenu.actualInventory[slot.myID] = result;
-                            Game1.playSound("coin");
-                        }
-                        else
-                        {
-                            if (!existingItem.canStackWith(result))
-                            {
-                                Game1.playSound("cancel");
-                                break;
-                            }
-                            int combinedStack = existingItem.Stack + result.Stack;
-                            int maxStackSize = existingItem.maximumStackSize();
-                            if (combinedStack <= maxStackSize)
-                            {
-                                existingItem.Stack = combinedStack;
-                                Game1.playSound("coin");
-                            }
-                            else
-                            {
-                                int availableSpace = maxStackSize - existingItem.Stack;
-                                if (availableSpace <= 0)
-                                {
-                                    Game1.playSound("cancel");
-                                    break;
-                                }
-                                existingItem.Stack += availableSpace;
-                                result.Stack -= availableSpace;
-                                Game1.playSound("coin");
-                            }
-                        }
-                        List<IInventory> inventories = FarmLinkTerminalMenu.GetAllStorageObjects().Select((Func<Chest, IInventory>)(ch => ch.Items)).ToList();
-                        for (int i = 0; i < this.craftAmount; i++)
-                        {
-                            this.currentRecipe.consumeIngredients(inventories);
-                        }
-                        this.UpdateCraftingTable();
-                        if (Game1.player.craftingRecipes.ContainsKey(this.currentRecipe.name))
-                        {
-                            Game1.player.craftingRecipes[this.currentRecipe.name] += this.craftAmount;
-                            Game1.stats.checkForCraftingAchievements();
-                        }
-                        this.craftMode = false;
-                        break;
-                    }
-                }
-                return;
-            }
-            base.receiveLeftClick(x, y, playSound);
-            this.scrollbar.ReceiveLeftClick(x, y);
-            var clicked = this.CraftingTable.GetClickedItem(x, y);
-            if (clicked == null || this.TerminalMenu == null)
-            {
-                return;
-            }
-            var recipe = ((!(clicked.QualifiedItemId == "(BC)holybananapants.UltimateStorageSystemContentPack_BlockTerminal")) ? this.craftingRecipes.FirstOrDefault(r => r.name == clicked.Name || r.DisplayName == clicked.DisplayName) : this.craftingRecipes.OfType<CraftingRecipeForBlockTerminal>().FirstOrDefault());
-            if (recipe == null)
-            {
-                return;
-            }
-            int maxCanCraft = recipe.getCraftableCount(FarmLinkTerminalMenu.GetAllStorageObjects());
-            if (maxCanCraft <= 0)
-            {
-                Game1.addHUDMessage(new HUDMessage(ModHelper.Helper.Translation.Get("not_enough_ingredients"), 3));
-                return;
-            }
-            bool shift = Game1.oldKBState.IsKeyDown(Keys.LeftShift) || Game1.oldKBState.IsKeyDown(Keys.RightShift);
-            this.craftAmount = ((!shift) ? 1 : Math.Min(5, maxCanCraft));
-            List<IInventory> chestInventories = FarmLinkTerminalMenu.GetAllStorageObjects().Select((Func<Chest, IInventory>)(chest => chest.Items)).ToList();
-            for (int i2 = 0; i2 < this.craftAmount; i2++)
-            {
-                recipe.consumeIngredients(chestInventories);
-            }
-            for (int i3 = 0; i3 < this.craftAmount; i3++)
-            {
-                Item result2 = ((!(clicked.QualifiedItemId == "(BC)holybananapants.UltimateStorageSystemContentPack_BlockTerminal")) ? recipe.createItem() : ItemRegistry.Create("(BC)holybananapants.UltimateStorageSystemContentPack_BlockTerminal"));
-                if (result2 != null)
-                {
-                    Game1.player.addItemToInventory(result2);
+                    result = ItemRegistry.Create("(BC)holybananapants.UltimateStorageSystemContentPack_BlockTerminal");
+                    result.Stack = this.craftAmount;
                 }
                 else
                 {
-                    Game1.playSound("cancel");
+                    result = this.currentRecipe.createItem();
+                    if (result == null)
+                    {
+                        Game1.playSound("cancel");
+                        return;
+                    }
+                    result.Stack = this.craftAmount;
                 }
+                if (existingItem == null)
+                {
+                    this.playerInventoryMenu.actualInventory[slotID] = result;
+                    Game1.playSound("coin");
+                }
+                else
+                {
+                    if (!existingItem.canStackWith(result))
+                    {
+                        Game1.playSound("cancel");
+                        return;
+                    }
+                    int combinedStack = existingItem.Stack + result.Stack;
+                    int maxStackSize = existingItem.maximumStackSize();
+                    if (combinedStack <= maxStackSize)
+                    {
+                        existingItem.Stack = combinedStack;
+                        Game1.playSound("coin");
+                    }
+                    else
+                    {
+                        int availableSpace = maxStackSize - existingItem.Stack;
+                        if (availableSpace <= 0)
+                        {
+                            Game1.playSound("cancel");
+                            return;
+                        }
+                        existingItem.Stack += availableSpace;
+                        result.Stack -= availableSpace;
+                        Game1.playSound("coin");
+                    }
+                }
+                List<IInventory> inventories = FarmLinkTerminalMenu.GetAllStorageObjects().Select((Func<Chest, IInventory>)(ch => ch.Items)).ToList();
+                for (int i = 0; i < this.craftAmount; i++)
+                {
+                    this.currentRecipe.consumeIngredients(inventories);
+                }
+                this.UpdateCraftingTable();
+                if (Game1.player.craftingRecipes.ContainsKey(this.currentRecipe.name))
+                {
+                    Game1.player.craftingRecipes[this.currentRecipe.name] += this.craftAmount;
+                    Game1.stats.checkForCraftingAchievements();
+                }
+                this.craftMode = false;
             }
-            Game1.playSound("coin");
-            this.UpdateCraftingTable();
+            else
+            {
+                base.receiveLeftClick(x, y, playSound);
+                this.scrollbar.ReceiveLeftClick(x, y);
+                var clicked = this.CraftingTable.GetClickedItem(x, y);
+                if (clicked == null || this.TerminalMenu == null)
+                {
+                    return;
+                }
+                var recipe = ((!(clicked.QualifiedItemId == "(BC)holybananapants.UltimateStorageSystemContentPack_BlockTerminal")) ? this.craftingRecipes.FirstOrDefault(r => r.name == clicked.Name || r.DisplayName == clicked.DisplayName) : this.craftingRecipes.OfType<CraftingRecipeForBlockTerminal>().FirstOrDefault());
+                if (recipe == null)
+                {
+                    return;
+                }
+                int maxCanCraft = recipe.getCraftableCount(FarmLinkTerminalMenu.GetAllStorageObjects());
+                if (maxCanCraft <= 0)
+                {
+                    Game1.addHUDMessage(new HUDMessage(ModHelper.Helper.Translation.Get("not_enough_ingredients"), 3));
+                    return;
+                }
+                bool shift = Game1.oldKBState.IsKeyDown(Keys.LeftShift) || Game1.oldKBState.IsKeyDown(Keys.RightShift);
+                this.craftAmount = ((!shift) ? 1 : Math.Min(5, maxCanCraft));
+                List<IInventory> chestInventories = FarmLinkTerminalMenu.GetAllStorageObjects().Select((Func<Chest, IInventory>)(chest => chest.Items)).ToList();
+                for (int i2 = 0; i2 < this.craftAmount; i2++)
+                {
+                    recipe.consumeIngredients(chestInventories);
+                }
+                for (int i3 = 0; i3 < this.craftAmount; i3++)
+                {
+                    Item result2 = ((!(clicked.QualifiedItemId == "(BC)holybananapants.UltimateStorageSystemContentPack_BlockTerminal")) ? recipe.createItem() : ItemRegistry.Create("(BC)holybananapants.UltimateStorageSystemContentPack_BlockTerminal"));
+                    if (result2 != null)
+                    {
+                        Game1.player.addItemToInventory(result2);
+                    }
+                    else
+                    {
+                        Game1.playSound("cancel");
+                    }
+                }
+                Game1.playSound("coin");
+                this.UpdateCraftingTable();
+            }
         }
 
         public override void receiveRightClick(int x, int y, bool playSound = true)

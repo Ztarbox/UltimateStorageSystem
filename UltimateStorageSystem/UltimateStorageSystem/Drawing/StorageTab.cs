@@ -203,17 +203,10 @@ namespace UltimateStorageSystem.Drawing
                 this.itemTransferManager.HandleRightClick(clickedItem, isInInventory: false, shiftPressed);
                 return;
             }
-            foreach (ClickableComponent slot in this.playerInventoryMenu.inventory)
+            Item inventoryItem = this.playerInventoryMenu.getItemAt(x, y);
+            if (inventoryItem != null)
             {
-                if (slot.containsPoint(x, y) && this.playerInventoryMenu.actualInventory.Count > slot.myID)
-                {
-                    Item inventoryItem = this.playerInventoryMenu.actualInventory[slot.myID];
-                    if (inventoryItem != null)
-                    {
-                        this.itemTransferManager.HandleRightClick(inventoryItem, isInInventory: true, shiftPressed);
-                    }
-                    break;
-                }
+                this.itemTransferManager.HandleRightClick(inventoryItem, isInInventory: true, shiftPressed);
             }
         }
 

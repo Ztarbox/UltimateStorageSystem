@@ -142,106 +142,102 @@ namespace UltimateStorageSystem.Drawing
         {
             if (this.cookMode && this.currentRecipe != null)
             {
-                foreach (ClickableComponent slot in this.playerInventoryMenu.inventory)
-                {
-                    if (slot.containsPoint(x, y) && this.playerInventoryMenu.actualInventory.Count > slot.myID)
-                    {
-                        Item existingItem = this.playerInventoryMenu.actualInventory[slot.myID];
-                        Item result = this.currentRecipe.createItem();
-                        if (result == null)
-                        {
-                            Game1.playSound("cancel");
-                        }
-                        else
-                        {
-                            result.Stack = this.cookAmount;
-                            if (existingItem == null)
-                            {
-                                this.playerInventoryMenu.actualInventory[slot.myID] = result;
-                                Game1.playSound("coin");
-                            }
-                            else
-                            {
-                                if (!existingItem.canStackWith(result))
-                                {
-                                    Game1.playSound("cancel");
-                                    break;
-                                }
-                                int combinedStack = existingItem.Stack + result.Stack;
-                                int maxStackSize = existingItem.maximumStackSize();
-                                if (combinedStack <= maxStackSize)
-                                {
-                                    existingItem.Stack = combinedStack;
-                                    Game1.playSound("coin");
-                                }
-                                else
-                                {
-                                    int availableSpace = maxStackSize - existingItem.Stack;
-                                    if (availableSpace <= 0)
-                                    {
-                                        Game1.playSound("cancel");
-                                        break;
-                                    }
-                                    existingItem.Stack += availableSpace;
-                                    result.Stack -= availableSpace;
-                                    Game1.playSound("coin");
-                                }
-                            }
-                            List<IInventory> inventories = FarmLinkTerminalMenu.GetAllStorageObjects().Select((Func<Chest, IInventory>)(ch => ch.Items)).ToList();
-                            for (int i = 0; i < this.cookAmount; i++)
-                            {
-                                this.ConsumeIngredientsPrioritized(this.currentRecipe, 1);
-                            }
-                            this.UpdateCookingTable();
-
-                            Game1.player.cookedRecipe(result.ItemId);
-                            Game1.stats.checkForCookingAchievements();
-
-                            this.cookMode = false;
-                        }
-                        break;
-                    }
-                }
-                return;
-            }
-            base.receiveLeftClick(x, y, playSound);
-            this.Scrollbar.ReceiveLeftClick(x, y);
-            var clickedItem = this.CookingTable.GetClickedItem(x, y);
-            if (clickedItem == null || this.TerminalMenu == null)
-            {
-                return;
-            }
-            var recipe = this.cookingRecipes.FirstOrDefault(r => r.name == clickedItem.Name || r.DisplayName == clickedItem.DisplayName);
-            if (recipe == null)
-            {
-                return;
-            }
-            int maxCanCook = recipe.getCraftableCount(FarmLinkTerminalMenu.GetAllStorageObjects());
-            if (maxCanCook <= 0)
-            {
-                Game1.addHUDMessage(new HUDMessage(ModHelper.Helper.Translation.Get("not_enough_ingredients"), 3));
-                return;
-            }
-            int toCook = ((!Game1.oldKBState.IsKeyDown(Keys.LeftShift) && !Game1.oldKBState.IsKeyDown(Keys.RightShift)) ? 1 : Math.Min(5, maxCanCook));
-            List<IInventory> inventories2 = FarmLinkTerminalMenu.GetAllStorageObjects().Select((Func<Chest, IInventory>)(ch => ch.Items)).ToList();
-            for (int i2 = 0; i2 < toCook; i2++)
-            {
-                this.ConsumeIngredientsPrioritized(recipe, 1);
-            }
-            for (int i3 = 0; i3 < toCook; i3++)
-            {
-                Item result2 = recipe.createItem();
-                if (result2 != null)
-                {
-                    Game1.player.addItemToInventory(result2);
-                }
-                else
+                var slotID = this.playerInventoryMenu.getInventoryPositionOfClick(x, y);
+                Item existingItem = this.playerInventoryMenu.actualInventory[slotID];
+                Item result = this.currentRecipe.createItem();
+                if (result == null)
                 {
                     Game1.playSound("cancel");
                 }
+                else
+                {
+                    result.Stack = this.cookAmount;
+                    if (existingItem == null)
+                    {
+                        this.playerInventoryMenu.actualInventory[slotID] = result;
+                        Game1.playSound("coin");
+                    }
+                    else
+                    {
+                        if (!existingItem.canStackWith(result))
+                        {
+                            Game1.playSound("cancel");
+                            return;
+                        }
+                        int combinedStack = existingItem.Stack + result.Stack;
+                        int maxStackSize = existingItem.maximumStackSize();
+                        if (combinedStack <= maxStackSize)
+                        {
+                            existingItem.Stack = combinedStack;
+                            Game1.playSound("coin");
+                        }
+                        else
+                        {
+                            int availableSpace = maxStackSize - existingItem.Stack;
+                            if (availableSpace <= 0)
+                            {
+                                Game1.playSound("cancel");
+                                return;
+                            }
+                            existingItem.Stack += availableSpace;
+                            result.Stack -= availableSpace;
+                            Game1.playSound("coin");
+                        }
+                    }
+                    List<IInventory> inventories = FarmLinkTerminalMenu.GetAllStorageObjects().Select((Func<Chest, IInventory>)(ch => ch.Items)).ToList();
+                    for (int i = 0; i < this.cookAmount; i++)
+                    {
+                        this.ConsumeIngredientsPrioritized(this.currentRecipe, 1);
+                    }
+                    this.UpdateCookingTable();
+
+                    Game1.player.cookedRecipe(result.ItemId);
+                    Game1.stats.checkForCookingAchievements();
+
+                    this.cookMode = false;
+                }
             }
-            Game1.playSound("coin");
-            this.UpdateCookingTable();
+            else
+            {
+                base.receiveLeftClick(x, y, playSound);
+                this.Scrollbar.ReceiveLeftClick(x, y);
+                var clickedItem = this.CookingTable.GetClickedItem(x, y);
+                if (clickedItem == null || this.TerminalMenu == null)
+                {
+                    return;
+                }
+                var recipe = this.cookingRecipes.FirstOrDefault(r => r.name == clickedItem.Name || r.DisplayName == clickedItem.DisplayName);
+                if (recipe == null)
+                {
+                    return;
+                }
+                int maxCanCook = recipe.getCraftableCount(FarmLinkTerminalMenu.GetAllStorageObjects());
+                if (maxCanCook <= 0)
+                {
+                    Game1.addHUDMessage(new HUDMessage(ModHelper.Helper.Translation.Get("not_enough_ingredients"), 3));
+                    return;
+                }
+                int toCook = ((!Game1.oldKBState.IsKeyDown(Keys.LeftShift) && !Game1.oldKBState.IsKeyDown(Keys.RightShift)) ? 1 : Math.Min(5, maxCanCook));
+                List<IInventory> inventories2 = FarmLinkTerminalMenu.GetAllStorageObjects().Select((Func<Chest, IInventory>)(ch => ch.Items)).ToList();
+                for (int i2 = 0; i2 < toCook; i2++)
+                {
+                    this.ConsumeIngredientsPrioritized(recipe, 1);
+                }
+                for (int i3 = 0; i3 < toCook; i3++)
+                {
+                    Item result2 = recipe.createItem();
+                    if (result2 != null)
+                    {
+                        Game1.player.addItemToInventory(result2);
+                    }
+                    else
+                    {
+                        Game1.playSound("cancel");
+                    }
+                }
+                Game1.playSound("coin");
+                this.UpdateCookingTable();
+            }
         }
 
         public override void receiveRightClick(int x, int y, bool playSound = true)
