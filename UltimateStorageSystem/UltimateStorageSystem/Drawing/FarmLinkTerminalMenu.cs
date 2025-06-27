@@ -323,12 +323,12 @@ namespace UltimateStorageSystem.Drawing
                         this.selectedTab = i;
                         this.commandInputField.UpdateTable(this.GetActiveTable());
                         this.commandInputField.Reset();
-                        this.StorageTab.ResetSort();
                         this.workbenchTab.ResetSort();
                         this.cookingTab.ResetSort();
                         if (this.selectedTab == 0)
                         {
                             this.StorageTab.RefreshItems();
+                            this.StorageTab.ResetSort();
                         }
                         return;
                     }
