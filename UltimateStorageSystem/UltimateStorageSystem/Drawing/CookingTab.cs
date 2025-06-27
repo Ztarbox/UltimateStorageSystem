@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewValley;
+using StardewValley.Buffs;
 using StardewValley.Inventories;
 using StardewValley.Menus;
 using StardewValley.Objects;
@@ -87,16 +88,31 @@ namespace UltimateStorageSystem.Drawing
             List<string> buffs = new();
             int health = cookedDish.healthRecoveredOnConsumption();
             int energy = cookedDish.staminaRecoveredOnConsumption();
+            
             if (health > 0)
             {
-                buffs.Add($"Health +{health}");
+                buffs.Add($"+{health} Health");
             }
             if (energy > 0)
             {
-                buffs.Add($"Energy +{energy}");
+                buffs.Add($"+{energy} Energy");
             }
+            var itemBuffs = cookedDish.GetFoodOrDrinkBuffs();
+            buffs.AddRange(itemBuffs.SelectMany(buff => BuffsDisplay.displayAttributes.Select(attrib => GetBuffDescription(buff, attrib)).Where(desc => !String.IsNullOrWhiteSpace(desc))));
             return (buffs.Count > 0) ? string.Join(", ", buffs) : "No Buffs";
         }
+
+        private static string GetBuffDescription(Buff buff, BuffAttributeDisplay attribute)
+        {
+            float value = attribute.Value(buff);
+            if (value == 0f)
+            {
+                return "";
+            }
+            string description = attribute.Description(value);
+            return description;
+        }
+
 
         private static string GetRecipeIngredients(CraftingRecipe craftingRecipe)
         {
